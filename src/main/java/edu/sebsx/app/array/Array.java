@@ -1,7 +1,9 @@
-package edu.sebsx.model.array;
+package edu.sebsx.app.array;
 
 import java.util.function.Function;
 import java.util.function.Predicate;
+
+import edu.sebsx.model.array.AbstractArray;
 import edu.sebsx.model.collection.Collection;
 import edu.sebsx.model.iterator.Iterator;
 

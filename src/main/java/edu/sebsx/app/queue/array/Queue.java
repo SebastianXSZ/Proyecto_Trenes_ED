@@ -2,7 +2,7 @@ package edu.sebsx.app.queue.array;
 
 import java.util.function.Function;
 
-import edu.sebsx.model.array.Array;
+import edu.sebsx.app.array.Array;
 import edu.sebsx.model.collection.Collection;
 import edu.sebsx.model.iterator.Iterator;
 import edu.sebsx.model.queue.AbstractQueue;
@@ -10,13 +10,13 @@ import edu.sebsx.model.queue.AbstractQueue;
 public class Queue<E> extends AbstractQueue<E> {
 
   private Array<E> array;
-  private int front;
-  private int end;
+  private int head;
+  private int tail;
 
   public Queue(int capacity) {
     this.array = new Array<>(capacity);
-    this.front = 0;
-    this.end = -1;
+    this.head = 0;
+    this.tail = -1;
   }
 
   @Override
@@ -24,7 +24,7 @@ public class Queue<E> extends AbstractQueue<E> {
     if(isEmpty()) {
       return null;
     }
-    return array.get(front);
+    return array.get(head);
   }
 
   @Override
@@ -32,20 +32,33 @@ public class Queue<E> extends AbstractQueue<E> {
     if(isEmpty()) {
       return null;
     }
-    E element = array.get(front);
-    array.remove(front);
-    end--;
+    E element = array.get(head);
+    if(head == array.size() - 1) {
+      array.remove(head);
+      head = 0;
+    } else {
+      head++;
+    }
+    tail--;
     return element;
   }
 
   @Override
   public boolean insert(E element) {
-    if(end == array.size() - 1){
-        return false;
+    if (isEmpty()) {
+      array.add(element);
+      tail++;
+      return true;
     }
-    array.add(element);
-    end++;
-    return true;
+    if(tail == array.size() - 1 && head > 0){
+      tail = 0;
+      array.add(element);
+      tail++;     
+    } else if(tail < array.size() - 1) {
+      array.add(element);
+      tail++;
+    }
+    return false;
   }
 
   @Override

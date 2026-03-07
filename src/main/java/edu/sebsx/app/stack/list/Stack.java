@@ -15,6 +15,10 @@ public class Stack<E> extends AbstractStack<E> {
     this.list = new SinglyLinkedList<>();
   }
 
+  public Stack(E element) {
+    this.list = new SinglyLinkedList<>(element);
+  }
+
   @Override
   public E peek() {
     return list.peekLast();

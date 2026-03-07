@@ -2,14 +2,14 @@ package edu.sebsx.app.stack.array;
 
 import java.util.function.Function;
 
+import edu.sebsx.app.array.Array;
 import edu.sebsx.model.collection.Collection;
 import edu.sebsx.model.iterator.Iterator;
 import edu.sebsx.model.stack.AbstractStack;
-import edu.sebsx.model.array.Array;
 
 public class Stack<E> extends AbstractStack<E> {
 
-  private Array<E> array;
+  private transient Array<E> array;
   private int top;
 
   public Stack(int capacity) {

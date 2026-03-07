@@ -15,6 +15,10 @@ public class Queue<E> extends AbstractQueue<E> {
     this.list = new SinglyLinkedList<>();
   }
 
+  public Queue(E element){
+    this.list = new SinglyLinkedList<>(element);
+  }
+
   @Override
   public E peek(){
     return list.peek();
