@@ -17,5 +17,10 @@
       <version>5.10.2</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>edu.sebsx</groupId>
+      <artifactId>data_structure</artifactId>
+      <version>0.0.1</version>
+    </dependency>
   </dependencies>
 </project>
