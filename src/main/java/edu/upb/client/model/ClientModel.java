@@ -2,10 +2,9 @@ package edu.upb.client.model;
 
 import java.rmi.Naming;
 
-import edu.upb.client.model.observer.Subject;
-import edu.upb.server.model.ticket.Customer;
-import edu.upb.server.model.ticket.Ticket;
-import edu.upb.server.model.ticket.TicketInterface;
+import edu.upb.common.TicketInterface;
+import edu.upb.model.Customer;
+import edu.upb.model.Ticket;
 
 public class ClientModel extends Subject {
   private String logger;

@@ -3,7 +3,7 @@ package edu.upb.client.factory;
 import edu.upb.client.controller.ClientController;
 import edu.upb.client.model.ClientModel;
 import edu.upb.client.view.ClientView;
-import edu.upb.environment.Environment;
+import edu.upb.common.Environment;
 
 public class ClientFactory {
 
