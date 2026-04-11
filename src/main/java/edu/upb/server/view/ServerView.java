@@ -4,16 +4,14 @@ import java.awt.Color;
 import java.awt.GridLayout;
 import java.util.function.UnaryOperator;
 import java.awt.GraphicsEnvironment;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
-
-import edu.upb.server.model.history.History;
-import edu.upb.server.model.observer.Observer;
-import edu.upb.server.model.observer.Subject;
+import edu.upb.server.observer.Observer;
+import edu.upb.server.observer.Subject;
+import edu.upb.server.model.History;
 
 public class ServerView extends Observer {
   private String title;
@@ -44,11 +42,9 @@ public class ServerView extends Observer {
       panelButton.setLayout(new GridLayout(3, 3));
       startButton(fn);
     }
-
     if (GraphicsEnvironment.isHeadless()) {
       return;
     }
-
     if (frame == null) {
       frame = new JFrame(title);
     }

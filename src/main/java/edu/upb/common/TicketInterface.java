@@ -2,11 +2,12 @@ package edu.upb.common;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-
 import edu.upb.model.Ticket;
 
 public interface TicketInterface extends Remote {
-  Ticket register(Ticket ticket) throws RemoteException;
 
+  Ticket register(Ticket ticket) throws RemoteException;
   boolean validate(Ticket ticket) throws RemoteException;
+  Ticket purchaseTicket(SaleDTO dto) throws RemoteException;
+  boolean validateUser(LoginDTO login) throws RemoteException;
 }

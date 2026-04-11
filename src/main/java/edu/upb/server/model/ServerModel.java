@@ -2,11 +2,11 @@ package edu.upb.server.model;
 
 import java.rmi.Naming;
 import java.rmi.registry.LocateRegistry;
+import edu.upb.common.TicketInterface;
+import edu.upb.server.service.TicketService;
+import edu.upb.server.observer.Subject;
 
-import edu.upb.server.model.ticket.TicketInterface;
-import edu.upb.server.model.ticket.TicketService;
-
-public class ServerModel {
+public class ServerModel extends Subject {
 
   private String ip;
   private int port;
@@ -17,10 +17,6 @@ public class ServerModel {
     this.ip = ip;
     this.port = port;
     this.serviceName = serviceName;
-    /*
-     * "//localhost:1802/tickets"
-     * "//10.153.60.48:1802/tickets"
-     */
     this.uri = "//" + ip + ":" + port + "/" + this.serviceName;
     System.out.println("URI: " + this.uri);
   }
@@ -37,5 +33,4 @@ public class ServerModel {
       return false;
     }
   }
-
 }
