@@ -1,12 +1,12 @@
 package edu.upb.model;
 
-public class Vagon {
+public class Wagon {
 
   private String id;
   private String type;
   private int capacity;
 
-  public Vagon(String id, String type, int capacity) {
+  public Wagon(String id, String type, int capacity) {
     this.id = id;
     this.type = type;
     this.capacity = capacity;
