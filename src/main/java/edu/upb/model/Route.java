@@ -1,5 +1,38 @@
 package edu.upb.model;
 
-public class Route {
-  
+import java.io.Serializable;
+import edu.sebsx.app.linkedlist.singly.SinglyLinkedList;
+
+public class Route implements Serializable {
+  private static final long serialVersionUID = 1L;
+
+  private String id;
+  private SinglyLinkedList<Station> stations;
+  private double distance;
+
+  public Route(String id) {
+    this.id = id;
+    this.stations = new SinglyLinkedList<>();
+    this.distance = 0.0;
+  }
+
+  public String getId() {
+    return id;
+  }
+
+  public SinglyLinkedList<Station> getStations() {
+    return stations;
+  }
+
+  public void addStation(Station station) {
+    stations.add(station);
+  }
+
+  public double getDistance() {
+    return distance;
+  }
+
+  public void setDistance(double distance) {
+    this.distance = distance;
+  }
 }
