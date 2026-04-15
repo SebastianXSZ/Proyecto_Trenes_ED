@@ -2,8 +2,10 @@ package edu.upb.client.model;
 
 import java.rmi.Naming;
 import edu.upb.common.TicketInterface;
-import edu.upb.model.Customer;
+import edu.upb.common.SaleDTO;
+import edu.upb.common.LoginDTO;
 import edu.upb.model.Ticket;
+import edu.upb.model.Customer;
 import edu.upb.client.observer.Subject;
 
 public class ClientModel extends Subject {
@@ -19,32 +21,34 @@ public class ClientModel extends Subject {
   public boolean connect() {
     try {
       this.ticketService = (TicketInterface) Naming.lookup(uri);
-      this.logger = ("Connecting to server at: " + uri);
+      this.logger = "Connected to server at: " + uri;
       this.notifyObservers();
       return true;
     } catch (Exception e) {
-      this.logger = ("Failed to connect to server at: " + uri);
+      this.logger = "Failed to connect: " + e.getMessage();
       this.notifyObservers();
-      e.printStackTrace();
       return false;
     }
   }
 
-  public TicketInterface getTicketService() {
-    return ticketService;
+  public boolean login(String username, String password) {
+    try {
+      LoginDTO dto = new LoginDTO(username, password);
+      return ticketService.validateUser(dto);
+    } catch (Exception e) {
+      this.logger = "Login error: " + e.getMessage();
+      this.notifyObservers();
+      return false;
+    }
   }
 
-  public void register(String names) {
+  public Ticket purchaseTicket(SaleDTO dto) {
     try {
-      Ticket ticket = new Ticket("", new Customer("1", names));
-      Ticket ticketRegistered = this.getTicketService().register(ticket);
-      this.logger = ("Registered with ticket: " + ticketRegistered.getId() + " for customer: "
-          + ticketRegistered.getCustomerName());
-      this.notifyObservers();
+      return ticketService.purchaseTicket(dto);
     } catch (Exception e) {
-      e.printStackTrace();
-      this.logger = "Registration failed: " + e.getMessage();
+      this.logger = "Purchase error: " + e.getMessage();
       this.notifyObservers();
+      return null;
     }
   }
 
