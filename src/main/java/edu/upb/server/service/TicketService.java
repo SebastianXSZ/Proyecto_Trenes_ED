@@ -7,41 +7,49 @@ import edu.upb.common.LoginDTO;
 import edu.upb.common.SaleDTO;
 import edu.upb.model.Ticket;
 import edu.upb.model.Customer;
+import edu.upb.server.business.SalesManager;
+import edu.upb.server.business.SecurityModule;
+import edu.upb.server.persistence.PersistenceModule;
 
 public class TicketService extends UnicastRemoteObject implements TicketInterface {
 
-  private int index = 0;
-  private Ticket[] tickets = new Ticket[100];
+  private SalesManager salesManager;
+  private SecurityModule securityModule;
+  private PersistenceModule persistenceModule;
 
   public TicketService() throws RemoteException {
     super();
+    this.salesManager = new SalesManager();
+    this.securityModule = new SecurityModule();
+    this.persistenceModule = new PersistenceModule();
   }
 
   @Override
   public Ticket register(Ticket ticket) throws RemoteException {
-    Ticket newTicket = new Ticket(String.valueOf(index + 1), new Customer("1", ticket.getCustomerName()));
-    tickets[index] = newTicket;
-    index++;
+    // Método legacy, lo dejamos funcional pero simple
+    Ticket newTicket = new Ticket();
+    newTicket.setPassengerName(ticket.getPassengerName());
+    persistenceModule.saveTicket(newTicket);
     return newTicket;
   }
 
   @Override
   public boolean validate(Ticket ticket) throws RemoteException {
-    for (int i = 0; i < index; i++) {
-      if (tickets[i].getId().equals(ticket.getId())) {
-        return true;
-      }
-    }
-    return false;
+    return persistenceModule.loadTickets()
+            .contains(ticket);
   }
 
   @Override
   public Ticket purchaseTicket(SaleDTO dto) throws RemoteException {
-    return new Ticket("PUR-" + System.currentTimeMillis(), new Customer("1", dto.getPassengerName()));
+    Ticket ticket = salesManager.processTransaction(dto);
+    if (ticket != null) {
+      persistenceModule.saveTicket(ticket);
+    }
+    return ticket;
   }
 
   @Override
   public boolean validateUser(LoginDTO login) throws RemoteException {
-    return "admin".equals(login.getUsername()) && "admin".equals(login.getPassword());
+    return securityModule.validateUser(login.getUsername(), login.getPassword());
   }
 }
