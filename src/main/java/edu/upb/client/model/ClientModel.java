@@ -5,7 +5,6 @@ import edu.upb.common.TicketInterface;
 import edu.upb.common.SaleDTO;
 import edu.upb.common.LoginDTO;
 import edu.upb.model.Ticket;
-import edu.upb.model.Customer;
 import edu.upb.client.observer.Subject;
 
 public class ClientModel extends Subject {
@@ -49,6 +48,19 @@ public class ClientModel extends Subject {
       this.logger = "Purchase error: " + e.getMessage();
       this.notifyObservers();
       return null;
+    }
+  }
+
+  public void register(String names) {
+    try {
+      Ticket ticket = new Ticket();
+      ticket.setPassengerName(names);
+      Ticket registered = ticketService.register(ticket);
+      this.logger = "Registered with ticket: " + registered.getRegistrationId() + " for: " + names;
+      this.notifyObservers();
+    } catch (Exception e) {
+      this.logger = "Registration failed: " + e.getMessage();
+      this.notifyObservers();
     }
   }
 
