@@ -13,6 +13,18 @@ public class SalesManager {
   public SalesManager() {
     this.fleet = new SinglyLinkedList<>();
     this.ticketCache = new HashTable<>(32);
+    initializeTestData();
+  }
+
+  private void initializeTestData() {
+    Train train = new MercedesBenzTrain("T1", "Expreso UPB", 1000, 5000);
+    PassengerWagon pw1 = new PassengerWagon("W1");
+    PassengerWagon pw2 = new PassengerWagon("W2");
+    CargoWagon cw1 = new CargoWagon("C1");
+    train.addWagon(pw1);
+    train.addWagon(pw2);
+    train.addWagon(cw1);
+    fleet.add(train);
   }
 
   public void addTrain(Train train) {
@@ -54,10 +66,12 @@ public class SalesManager {
     Iterator<Wagon> it = wagons.iterator();
     while (it.hasNext()) {
       Wagon w = it.next();
-      PassengerWagon pw = (PassengerWagon) w;
-      String seat = pw.assignSeat(category);
-      if (seat != null) {
-        return w.getId() + "-" + seat;
+      if (w instanceof PassengerWagon) {
+        PassengerWagon pw = (PassengerWagon) w;
+        String seat = pw.assignSeat(category);
+        if (seat != null) {
+          return w.getId() + "-" + seat;
+        }
       }
     }
     return null;
