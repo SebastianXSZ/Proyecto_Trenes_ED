@@ -13,16 +13,16 @@ public class ClientController {
   }
 
   public void init() {
-    view.initComponents(text -> {
+    boolean connected = model.connect();
+    if (!connected) {
+      view.setMessage("Error: No se pudo conectar al servidor.");
+      return;
+    }
+    view.setRegisterTicketHandler(text -> {
       model.register(text);
       return null;
     });
     view.setVisible(true);
-    if (model.connect()) {
-      view.setMessage("Connected to server.");
-    } else {
-      view.setMessage("Failed to connect to server.");
-    }
+    view.setMessage("Conectado al servidor. Ingrese un nombre.");
   }
-
 }
