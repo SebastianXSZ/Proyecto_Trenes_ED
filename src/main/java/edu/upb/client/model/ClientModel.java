@@ -3,7 +3,6 @@ package edu.upb.client.model;
 import java.rmi.Naming;
 import edu.upb.common.TicketInterface;
 import edu.upb.common.SaleDTO;
-import edu.upb.common.LoginDTO;
 import edu.upb.model.Ticket;
 import edu.upb.client.observer.Subject;
 
@@ -30,27 +29,6 @@ public class ClientModel extends Subject {
     }
   }
 
-  public boolean login(String username, String password) {
-    try {
-      LoginDTO dto = new LoginDTO(username, password);
-      return ticketService.validateUser(dto);
-    } catch (Exception e) {
-      this.logger = "Login error: " + e.getMessage();
-      this.notifyObservers();
-      return false;
-    }
-  }
-
-  public Ticket purchaseTicket(SaleDTO dto) {
-    try {
-      return ticketService.purchaseTicket(dto);
-    } catch (Exception e) {
-      this.logger = "Purchase error: " + e.getMessage();
-      this.notifyObservers();
-      return null;
-    }
-  }
-
   public void register(String names) {
     try {
       Ticket ticket = new Ticket();
@@ -61,6 +39,26 @@ public class ClientModel extends Subject {
     } catch (Exception e) {
       this.logger = "Registration failed: " + e.getMessage();
       this.notifyObservers();
+    }
+  }
+
+  public String[] getStationNames() {
+    try {
+      return ticketService.getStationNames();
+    } catch (Exception e) {
+      this.logger = "Error fetching stations: " + e.getMessage();
+      this.notifyObservers();
+      return new String[0];
+    }
+  }
+
+  public Ticket purchaseTicket(SaleDTO dto) {
+    try {
+      return ticketService.purchaseTicket(dto);
+    } catch (Exception e) {
+      this.logger = "Purchase error: " + e.getMessage();
+      this.notifyObservers();
+      return null;
     }
   }
 
