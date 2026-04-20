@@ -1,47 +1,40 @@
 package edu.upb.client.controller;
 
 import edu.upb.client.model.ClientModel;
-import edu.upb.client.view.ClientView;
+import edu.upb.client.view.PurchaseView;
 import edu.upb.common.SaleDTO;
 import edu.upb.model.Ticket;
 
 public class ClientController {
-  private ClientModel model;
-  private ClientView view;
+    private ClientModel model;
+    private PurchaseView view;
 
-  public ClientController(ClientModel model, ClientView view) {
-    this.model = model;
-    this.view = view;
-  }
-
-  public void init() {
-    boolean connected = model.connect();
-    if (!connected) {
-      view.showError("No se pudo conectar al servidor.");
-      return;
+    public ClientController(ClientModel model, PurchaseView view) {
+        this.model = model;
+        this.view = view;
     }
 
-    // Cargar estaciones desde el servidor
-    String[] stations = model.getStationNames();
-    view.setStationNames(stations);
-
-    // Configurar handler de compra
-    view.setPurchaseHandler(this::handlePurchase);
-
-    view.setVisible(true);
-    view.showMessage("Conectado. Seleccione origen y destino.");
-  }
-
-  private void handlePurchase(SaleDTO dto) {
-    try {
-      Ticket ticket = model.purchaseTicket(dto);
-      if (ticket != null) {
-        view.displayTicket(ticket);
-      } else {
-        view.showError("No se pudo completar la compra. Verifique disponibilidad.");
-      }
-    } catch (Exception e) {
-      view.showError("Error en la compra: " + e.getMessage());
+    public void init() {
+        boolean connected = model.connect();
+        if (!connected) {
+            javax.swing.JOptionPane.showMessageDialog(null, "No se pudo conectar al servidor.");
+            return;
+        }
+        view.setStationNames(model.getStationNames());
+        view.setPurchaseHandler(this::handlePurchase);
+        view.setVisible(true);
     }
-  }
+
+    private void handlePurchase(SaleDTO dto) {
+        try {
+            Ticket ticket = model.purchaseTicket(dto);
+            if (ticket != null) {
+                view.showTicket(ticket);
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(view, "Compra fallida. Verifique disponibilidad.");
+            }
+        } catch (Exception e) {
+            javax.swing.JOptionPane.showMessageDialog(view, "Error: " + e.getMessage());
+        }
+    }
 }

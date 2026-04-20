@@ -2,7 +2,7 @@ package edu.upb.client.factory;
 
 import edu.upb.client.controller.ClientController;
 import edu.upb.client.model.ClientModel;
-import edu.upb.client.view.ClientView;
+import edu.upb.client.view.PurchaseView;
 import edu.upb.common.Environment;
 
 public class ClientFactory {
@@ -26,7 +26,7 @@ public class ClientFactory {
 
     ClientModel model = new ClientModel(env.getIp(), env.getPort(), env.getServiceName());
 
-    ClientView view = new ClientView(model);
+    PurchaseView view = new PurchaseView(model);
 
     return new ClientController(model, view);
   }
