@@ -2,6 +2,7 @@ package edu.upb.client.model;
 
 import java.rmi.Naming;
 import edu.upb.common.TicketInterface;
+import edu.upb.common.LoginDTO;
 import edu.upb.common.SaleDTO;
 import edu.upb.model.Ticket;
 import edu.upb.client.observer.Subject;
@@ -59,6 +60,17 @@ public class ClientModel extends Subject {
       this.logger = "Purchase error: " + e.getMessage();
       this.notifyObservers();
       return null;
+    }
+  }
+
+  public boolean login(String username, String password) {
+    try {
+      LoginDTO dto = new LoginDTO(username, password);
+      return ticketService.validateUser(dto);
+    } catch (Exception e) {
+      this.logger = "Login error: " + e.getMessage();
+      this.notifyObservers();
+      return false;
     }
   }
 
