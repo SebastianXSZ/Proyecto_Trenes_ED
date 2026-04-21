@@ -32,14 +32,10 @@ public class SalesManager {
   }
 
   public Ticket processTransaction(SaleDTO dto) {
-    Train selectedTrain = findTrainById(dto.getTrainId());
-    if (selectedTrain == null) {
-      return null;
-    }
+    if (fleet.isEmpty()) return null;
+    Train selectedTrain = fleet.iterator().next();
     String seat = assignSeat(selectedTrain, dto.getCategory());
-    if (seat == null) {
-      return null;
-    }
+    if (seat == null) return null;
     Ticket ticket = new Ticket();
     ticket.setTrainId(dto.getTrainId());
     ticket.setPassengerName(dto.getPassengerName());
@@ -54,9 +50,7 @@ public class SalesManager {
     Iterator<Train> it = fleet.iterator();
     while (it.hasNext()) {
       Train t = it.next();
-      if (t.getId().equals(trainId)) {
-        return t;
-      }
+      if (t.getId().equals(trainId)) return t;
     }
     return null;
   }
@@ -69,9 +63,7 @@ public class SalesManager {
       if (w instanceof PassengerWagon) {
         PassengerWagon pw = (PassengerWagon) w;
         String seat = pw.assignSeat(category);
-        if (seat != null) {
-          return w.getId() + "-" + seat;
-        }
+        if (seat != null) return w.getId() + "-" + seat;
       }
     }
     return null;
@@ -79,17 +71,13 @@ public class SalesManager {
 
   public boolean checkAvailability(String trainId, String category) {
     Train train = findTrainById(trainId);
-    if (train == null) {
-      return false;
-    }
+    if (train == null) return false;
     SinglyLinkedList<Wagon> wagons = train.getWagons();
     Iterator<Wagon> it = wagons.iterator();
     while (it.hasNext()) {
       Wagon w = it.next();
       PassengerWagon pw = (PassengerWagon) w;
-      if (pw.getAvailableSeatsByCategory(category) > 0) {
-        return true;
-      }
+      if (pw.getAvailableSeatsByCategory(category) > 0) return true;
     }
     return false;
   }
