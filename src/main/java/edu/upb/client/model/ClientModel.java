@@ -2,11 +2,13 @@ package edu.upb.client.model;
 
 import java.rmi.Naming;
 import edu.upb.common.TicketInterface;
-import edu.upb.common.LoginDTO;
 import edu.upb.common.SaleDTO;
+import edu.upb.common.LoginDTO;
 import edu.upb.model.Ticket;
 import edu.upb.model.Train;
 import edu.upb.client.observer.Subject;
+import edu.sebsx.model.list.List;
+import edu.sebsx.app.linkedlist.singly.SinglyLinkedList;
 
 public class ClientModel extends Subject {
   private String logger;
@@ -31,26 +33,14 @@ public class ClientModel extends Subject {
     }
   }
 
-  public void register(String names) {
+  public boolean login(String username, String password) {
     try {
-      Ticket ticket = new Ticket();
-      ticket.setPassengerName(names);
-      Ticket registered = ticketService.register(ticket);
-      this.logger = "Registered with ticket: " + registered.getRegistrationId() + " for: " + names;
-      this.notifyObservers();
+      LoginDTO dto = new LoginDTO(username, password);
+      return ticketService.validateUser(dto);
     } catch (Exception e) {
-      this.logger = "Registration failed: " + e.getMessage();
+      this.logger = "Login error: " + e.getMessage();
       this.notifyObservers();
-    }
-  }
-
-  public String[] getStationNames() {
-    try {
-      return ticketService.getStationNames();
-    } catch (Exception e) {
-      this.logger = "Error fetching stations: " + e.getMessage();
-      this.notifyObservers();
-      return new String[0];
+      return false;
     }
   }
 
@@ -64,39 +54,75 @@ public class ClientModel extends Subject {
     }
   }
 
-  public boolean login(String username, String password) {
+  public String[] getStationNames() {
     try {
-      LoginDTO dto = new LoginDTO(username, password);
-      return ticketService.validateUser(dto);
+      return ticketService.getStationNames();
     } catch (Exception e) {
-      this.logger = "Login error: " + e.getMessage();
+      this.logger = "Error fetching stations: " + e.getMessage();
       this.notifyObservers();
+      return new String[0];
+    }
+  }
+
+  public void register(String names) {
+    try {
+      Ticket ticket = new Ticket();
+      ticket.setPassengerName(names);
+      Ticket registered = ticketService.register(ticket);
+      this.logger = "Registered with ticket: " + registered.getRegistrationId() + " for: " + names;
+      this.notifyObservers();
+    } catch (Exception e) {
+      this.logger = "Registration failed: " + e.getMessage();
+      this.notifyObservers();
+    }
+  }
+
+  public List<Train> getAllTrains() {
+    try {
+      return ticketService.getAllTrains();
+    } catch (Exception e) {
+      logger = "Error fetching trains: " + e.getMessage();
+      notifyObservers();
+      return new SinglyLinkedList<>();
+    }
+  }
+
+  public boolean addTrain(Train train) {
+    try {
+      return ticketService.addTrain(train);
+    } catch (Exception e) {
+      logger = "Error adding train: " + e.getMessage();
+      notifyObservers();
       return false;
     }
   }
 
-  public String getLogger() {
-    return logger;
+  public boolean updateTrain(Train train) {
+    try {
+      return ticketService.updateTrain(train);
+    } catch (Exception e) {
+      logger = "Error updating train: " + e.getMessage();
+      notifyObservers();
+      return false;
+    }
   }
 
-  public edu.sebsx.model.list.List<Train> getAllTrains() throws Exception {
-    return ticketService.getAllTrains();
-  }
-
-  public boolean addTrain(Train train) throws Exception {
-    return ticketService.addTrain(train);
-  }
-
-  public boolean updateTrain(Train train) throws Exception {
-    return ticketService.updateTrain(train);
-  }
-
-  public boolean deleteTrain(String trainId) throws Exception {
-    return ticketService.deleteTrain(trainId);
+  public boolean deleteTrain(String trainId) {
+    try {
+      return ticketService.deleteTrain(trainId);
+    } catch (Exception e) {
+      logger = "Error deleting train: " + e.getMessage();
+      notifyObservers();
+      return false;
+    }
   }
 
   public String getUserRole(String username) {
     if ("admin".equals(username)) return "ADMIN";
     return "OPERATOR";
+  }
+
+  public String getLogger() {
+    return logger;
   }
 }
