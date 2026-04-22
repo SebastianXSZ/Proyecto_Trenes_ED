@@ -31,28 +31,52 @@ public class SalesManager {
     fleet.add(train);
   }
 
+  public Train[] getAllTrains() {
+    Train[] trains = new Train[fleet.size()];
+    Iterator<Train> it = fleet.iterator();
+    int i = 0;
+    while (it.hasNext()) trains[i++] = it.next();
+    return trains;
+  }
+
+  public void updateTrain(Train updatedTrain) {
+    Iterator<Train> it = fleet.iterator();
+    int i = 0;
+    while (it.hasNext()) {
+      Train t = it.next();
+      if (t.getId().equals(updatedTrain.getId())) {
+        fleet.remove(t);
+        fleet.add(updatedTrain);
+        return;
+      }
+      i++;
+    }
+  }
+
+  public void deleteTrain(String trainId) {
+    Iterator<Train> it = fleet.iterator();
+    while (it.hasNext()) {
+      Train t = it.next();
+      if (t.getId().equals(trainId)) {
+        fleet.remove(t);
+        return;
+      }
+    }
+  }
+
   public Ticket processTransaction(SaleDTO dto) {
     if (fleet.isEmpty()) return null;
     Train selectedTrain = fleet.iterator().next();
     String seat = assignSeat(selectedTrain, dto.getCategory());
     if (seat == null) return null;
     Ticket ticket = new Ticket();
-    ticket.setTrainId(dto.getTrainId());
+    ticket.setTrainId(selectedTrain.getId());
     ticket.setPassengerName(dto.getPassengerName());
     ticket.setCategory(dto.getCategory());
     ticket.setSeatNumber(seat);
     ticket.setFareValue(100.0);
     ticketCache.put(ticket.getRegistrationId(), ticket);
     return ticket;
-  }
-
-  private Train findTrainById(String trainId) {
-    Iterator<Train> it = fleet.iterator();
-    while (it.hasNext()) {
-      Train t = it.next();
-      if (t.getId().equals(trainId)) return t;
-    }
-    return null;
   }
 
   public String assignSeat(Train train, String category) {
@@ -76,9 +100,20 @@ public class SalesManager {
     Iterator<Wagon> it = wagons.iterator();
     while (it.hasNext()) {
       Wagon w = it.next();
-      PassengerWagon pw = (PassengerWagon) w;
-      if (pw.getAvailableSeatsByCategory(category) > 0) return true;
+      if (w instanceof PassengerWagon) {
+        PassengerWagon pw = (PassengerWagon) w;
+        if (pw.getAvailableSeatsByCategory(category) > 0) return true;
+      }
     }
     return false;
+  }
+
+  private Train findTrainById(String trainId) {
+    Iterator<Train> it = fleet.iterator();
+    while (it.hasNext()) {
+      Train t = it.next();
+      if (t.getId().equals(trainId)) return t;
+    }
+    return null;
   }
 }
