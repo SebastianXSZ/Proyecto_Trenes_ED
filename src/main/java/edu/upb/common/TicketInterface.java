@@ -3,7 +3,9 @@ package edu.upb.common;
 import edu.upb.model.Train;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import edu.sebsx.app.linkedlist.singly.SinglyLinkedList;
 import edu.sebsx.model.list.List;
+import edu.upb.model.Passenger;
 import edu.upb.model.Ticket;
 
 public interface TicketInterface extends Remote {
@@ -16,4 +18,5 @@ public interface TicketInterface extends Remote {
   boolean addTrain(Train train) throws RemoteException;
   boolean updateTrain(Train train) throws RemoteException;
   boolean deleteTrain(String trainId) throws RemoteException;
+  SinglyLinkedList<Passenger> getBoardingOrder(String trainId) throws RemoteException;
 }

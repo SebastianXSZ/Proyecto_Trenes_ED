@@ -6,10 +6,13 @@ import edu.upb.common.TicketInterface;
 import edu.upb.common.LoginDTO;
 import edu.upb.common.SaleDTO;
 import edu.upb.model.Train;
+import edu.upb.model.Passenger;
 import edu.upb.model.Ticket;
+import edu.upb.server.business.BoardingMonitor;
 import edu.upb.server.business.SalesManager;
 import edu.upb.server.business.SecurityModule;
 import edu.upb.server.persistence.PersistenceModule;
+import edu.sebsx.app.linkedlist.singly.SinglyLinkedList;
 import edu.sebsx.model.list.List;
 
 public class TicketService extends UnicastRemoteObject implements TicketInterface {
@@ -73,5 +76,13 @@ public class TicketService extends UnicastRemoteObject implements TicketInterfac
   @Override
   public boolean deleteTrain(String trainId) throws RemoteException {
     return salesManager.deleteTrain(trainId);
+  }
+
+  @Override
+  public SinglyLinkedList<Passenger> getBoardingOrder(String trainId) throws RemoteException {
+    Train train = salesManager.findTrainById(trainId);
+    if (train == null) return new SinglyLinkedList<>();
+    BoardingMonitor monitor = new BoardingMonitor();
+    return monitor.getBoardingOrder(train);
   }
 }

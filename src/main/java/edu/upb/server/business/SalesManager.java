@@ -170,4 +170,13 @@ public class SalesManager {
     if (found) fleet = newList;
     return found;
   }
+
+  public Train findTrainById(String trainId) {
+    Iterator<Train> it = fleet.iterator();
+    while (it.hasNext()) {
+      Train t = it.next();
+      if (t.getId().equals(trainId)) return t;
+    }
+    return null;
+  }
 }
