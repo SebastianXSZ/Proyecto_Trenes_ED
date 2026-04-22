@@ -41,7 +41,6 @@ public class SalesManager {
 
   public void updateTrain(Train updatedTrain) {
     Iterator<Train> it = fleet.iterator();
-    int i = 0;
     while (it.hasNext()) {
       Train t = it.next();
       if (t.getId().equals(updatedTrain.getId())) {
@@ -49,7 +48,6 @@ public class SalesManager {
         fleet.add(updatedTrain);
         return;
       }
-      i++;
     }
   }
 
@@ -84,11 +82,9 @@ public class SalesManager {
     Iterator<Wagon> it = wagons.iterator();
     while (it.hasNext()) {
       Wagon w = it.next();
-      if (w instanceof PassengerWagon) {
-        PassengerWagon pw = (PassengerWagon) w;
-        String seat = pw.assignSeat(category);
-        if (seat != null) return w.getId() + "-" + seat;
-      }
+      PassengerWagon pw = (PassengerWagon) w;
+      String seat = pw.assignSeat(category);
+      if (seat != null) return w.getId() + "-" + seat;
     }
     return null;
   }
@@ -100,10 +96,8 @@ public class SalesManager {
     Iterator<Wagon> it = wagons.iterator();
     while (it.hasNext()) {
       Wagon w = it.next();
-      if (w instanceof PassengerWagon) {
-        PassengerWagon pw = (PassengerWagon) w;
-        if (pw.getAvailableSeatsByCategory(category) > 0) return true;
-      }
+      PassengerWagon pw = (PassengerWagon) w;
+      if (pw.getAvailableSeatsByCategory(category) > 0) return true;
     }
     return false;
   }
