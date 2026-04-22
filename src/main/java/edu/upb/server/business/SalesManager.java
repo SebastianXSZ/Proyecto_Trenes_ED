@@ -6,15 +6,68 @@ import edu.sebsx.app.linkedlist.singly.SinglyLinkedList;
 import edu.sebsx.app.hashtable.HashTable;
 import edu.sebsx.model.iterator.Iterator;
 import edu.sebsx.model.list.List;
+import edu.sebsx.app.graph.GraphMatrix;
 
 public class SalesManager {
   private SinglyLinkedList<Train> fleet;
   private HashTable<String, Ticket> ticketCache;
+  private GraphMatrix<Station, Double> graph;
+  private SinglyLinkedList<Station> stations;
 
   public SalesManager() {
     this.fleet = new SinglyLinkedList<>();
     this.ticketCache = new HashTable<>(32);
+    this.graph = new GraphMatrix<>(11);
+    this.stations = new SinglyLinkedList<>();
+    initializeStationsAndGraph();
     initializeTestData();
+  }
+
+  private void initializeStationsAndGraph() {
+    String[] names = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"};
+    for (String name : names) {
+      Station s = new Station(name, name);
+      stations.add(s);
+      graph.addVertex(s);
+    }
+    double[][] distances = {
+      {0, 30, 40, 50, -1, -1, 50, -1, -1, -1, -1},
+      {30, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+      {40, -1, 0, -1, -1, -1, 80, 120, 110, -1, -1},
+      {50, -1, -1, 0, 20, -1, -1, -1, -1, -1, -1},
+      {-1, -1, -1, 20, 0, 65, -1, -1, -1, -1, -1},
+      {-1, -1, -1, -1, 65, 0, 50, 65, 80, -1, -1},
+      {50, -1, 80, -1, -1, 50, 0, 30, -1, -1, 145},
+      {-1, -1, 120, -1, -1, 65, 30, 0, -1, 80, -1},
+      {-1, -1, 110, -1, -1, 80, -1, -1, 0, -1, 145},
+      {-1, -1, -1, -1, -1, -1, -1, 80, -1, 0, 120},
+      {-1, -1, -1, -1, -1, -1, 145, -1, 145, 120, 0}
+    };
+    for (int i = 0; i < 11; i++) {
+      for (int j = 0; j < 11; j++) {
+        if (distances[i][j] > 0) graph.addEdge(getStation(i), getStation(j), distances[i][j]);
+      }
+    }
+  }
+
+  private Station getStation(int index) {
+    Iterator<Station> it = stations.iterator();
+    int i = 0;
+    while (it.hasNext()) {
+      Station s = it.next();
+      if (i == index) return s;
+      i++;
+    }
+    return null;
+  }
+
+  private Station findStationById(String id) {
+    Iterator<Station> it = stations.iterator();
+    while (it.hasNext()) {
+      Station s = it.next();
+      if (s.getId().equals(id)) return s;
+    }
+    return null;
   }
 
   private void initializeTestData() {
@@ -33,14 +86,32 @@ public class SalesManager {
     Train selectedTrain = fleet.iterator().next();
     String seat = assignSeat(selectedTrain, dto.getCategory());
     if (seat == null) return null;
+    double fare = calculateFare(dto.getOrigin(), dto.getDestination());
     Ticket ticket = new Ticket();
     ticket.setTrainId(selectedTrain.getId());
     ticket.setPassengerName(dto.getPassengerName());
     ticket.setCategory(dto.getCategory());
     ticket.setSeatNumber(seat);
-    ticket.setFareValue(100.0);
+    ticket.setFareValue(fare);
     ticketCache.put(ticket.getRegistrationId(), ticket);
     return ticket;
+  }
+
+  private double calculateFare(String originId, String destinationId) {
+    Station origin = findStationById(originId);
+    Station destination = findStationById(destinationId);
+    if (origin == null || destination == null) return 100.0;
+    SinglyLinkedList<Station> path = graph.getShortestPath(origin, destination);
+    if (path.isEmpty()) return 100.0;
+    double totalDistance = 0.0;
+    Iterator<Station> it = path.iterator();
+    Station prev = null;
+    while (it.hasNext()) {
+      Station curr = it.next();
+      if (prev != null) totalDistance += graph.getEdgeWeight(prev, curr);
+      prev = curr;
+    }
+    return totalDistance * 100.0;
   }
 
   private String assignSeat(Train train, String category) {
@@ -54,7 +125,6 @@ public class SalesManager {
     }
     return null;
   }
-
 
   public List<Train> getAllTrains() {
     SinglyLinkedList<Train> copy = new SinglyLinkedList<>();
