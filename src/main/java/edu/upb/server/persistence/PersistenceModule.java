@@ -23,9 +23,7 @@ public class PersistenceModule {
   @SuppressWarnings("unchecked")
   public SinglyLinkedList<Ticket> loadTickets() {
     File file = new File(TICKETS_FILE);
-    if (!file.exists()) {
-      return new SinglyLinkedList<>();
-    }
+    if (!file.exists()) return new SinglyLinkedList<>();
     try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
       return (SinglyLinkedList<Ticket>) ois.readObject();
     } catch (Exception e) {

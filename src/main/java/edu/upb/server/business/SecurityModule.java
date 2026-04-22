@@ -32,9 +32,7 @@ public class SecurityModule {
 
   public boolean validateUser(String username, String password) {
     User user = users.get(username);
-    if (user == null) {
-      return false;
-    }
+    if (user == null) return false;
     return user.getPasswordHash().equals(hashPassword(password));
   }
 

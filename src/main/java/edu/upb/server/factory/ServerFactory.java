@@ -13,14 +13,10 @@ public class ServerFactory {
 
   public static ServerController create() {
     Environment env = Environment.getInstance();
-    if (env == null) {
-      throw new IllegalStateException("Failed to create Environment");
-    }
-
+    if (env == null) throw new IllegalStateException("Failed to create Environment");
     History history = new History();
     ServerModel model = new ServerModel(env.getIp(), env.getPort(), env.getServiceName());
     ServerView view = new ServerView("Server Control Panel", history);
-
     return new ServerController(model, view);
   }
 }
