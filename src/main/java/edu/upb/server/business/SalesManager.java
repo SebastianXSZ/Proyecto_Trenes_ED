@@ -5,6 +5,7 @@ import edu.upb.common.SaleDTO;
 import edu.sebsx.app.linkedlist.singly.SinglyLinkedList;
 import edu.sebsx.app.hashtable.HashTable;
 import edu.sebsx.model.iterator.Iterator;
+import edu.sebsx.model.list.List;
 
 public class SalesManager {
   private SinglyLinkedList<Train> fleet;
@@ -27,41 +28,6 @@ public class SalesManager {
     fleet.add(train);
   }
 
-  public void addTrain(Train train) {
-    fleet.add(train);
-  }
-
-  public Train[] getAllTrains() {
-    Train[] trains = new Train[fleet.size()];
-    Iterator<Train> it = fleet.iterator();
-    int i = 0;
-    while (it.hasNext()) trains[i++] = it.next();
-    return trains;
-  }
-
-  public void updateTrain(Train updatedTrain) {
-    Iterator<Train> it = fleet.iterator();
-    while (it.hasNext()) {
-      Train t = it.next();
-      if (t.getId().equals(updatedTrain.getId())) {
-        fleet.remove(t);
-        fleet.add(updatedTrain);
-        return;
-      }
-    }
-  }
-
-  public void deleteTrain(String trainId) {
-    Iterator<Train> it = fleet.iterator();
-    while (it.hasNext()) {
-      Train t = it.next();
-      if (t.getId().equals(trainId)) {
-        fleet.remove(t);
-        return;
-      }
-    }
-  }
-
   public Ticket processTransaction(SaleDTO dto) {
     if (fleet.isEmpty()) return null;
     Train selectedTrain = fleet.iterator().next();
@@ -77,7 +43,7 @@ public class SalesManager {
     return ticket;
   }
 
-  public String assignSeat(Train train, String category) {
+  private String assignSeat(Train train, String category) {
     SinglyLinkedList<Wagon> wagons = train.getWagons();
     Iterator<Wagon> it = wagons.iterator();
     while (it.hasNext()) {
@@ -89,25 +55,49 @@ public class SalesManager {
     return null;
   }
 
-  public boolean checkAvailability(String trainId, String category) {
-    Train train = findTrainById(trainId);
-    if (train == null) return false;
-    SinglyLinkedList<Wagon> wagons = train.getWagons();
-    Iterator<Wagon> it = wagons.iterator();
-    while (it.hasNext()) {
-      Wagon w = it.next();
-      PassengerWagon pw = (PassengerWagon) w;
-      if (pw.getAvailableSeatsByCategory(category) > 0) return true;
-    }
-    return false;
+
+  public List<Train> getAllTrains() {
+    SinglyLinkedList<Train> copy = new SinglyLinkedList<>();
+    Iterator<Train> it = fleet.iterator();
+    while (it.hasNext()) copy.add(it.next());
+    return copy;
   }
 
-  private Train findTrainById(String trainId) {
+  public boolean addTrain(Train train) {
+    fleet.add(train);
+    return true;
+  }
+
+  public boolean updateTrain(Train updatedTrain) {
     Iterator<Train> it = fleet.iterator();
+    SinglyLinkedList<Train> newList = new SinglyLinkedList<>();
+    boolean found = false;
     while (it.hasNext()) {
       Train t = it.next();
-      if (t.getId().equals(trainId)) return t;
+      if (t.getId().equals(updatedTrain.getId())) {
+        newList.add(updatedTrain);
+        found = true;
+      } else {
+        newList.add(t);
+      }
     }
-    return null;
+    if (found) fleet = newList;
+    return found;
+  }
+
+  public boolean deleteTrain(String trainId) {
+    Iterator<Train> it = fleet.iterator();
+    SinglyLinkedList<Train> newList = new SinglyLinkedList<>();
+    boolean found = false;
+    while (it.hasNext()) {
+      Train t = it.next();
+      if (t.getId().equals(trainId)) {
+        found = true;
+      } else {
+        newList.add(t);
+      }
+    }
+    if (found) fleet = newList;
+    return found;
   }
 }

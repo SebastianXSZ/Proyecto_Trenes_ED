@@ -5,6 +5,7 @@ import edu.upb.common.TicketInterface;
 import edu.upb.common.LoginDTO;
 import edu.upb.common.SaleDTO;
 import edu.upb.model.Ticket;
+import edu.upb.model.Train;
 import edu.upb.client.observer.Subject;
 
 public class ClientModel extends Subject {
@@ -76,5 +77,26 @@ public class ClientModel extends Subject {
 
   public String getLogger() {
     return logger;
+  }
+
+  public edu.sebsx.model.list.List<Train> getAllTrains() throws Exception {
+    return ticketService.getAllTrains();
+  }
+
+  public boolean addTrain(Train train) throws Exception {
+    return ticketService.addTrain(train);
+  }
+
+  public boolean updateTrain(Train train) throws Exception {
+    return ticketService.updateTrain(train);
+  }
+
+  public boolean deleteTrain(String trainId) throws Exception {
+    return ticketService.deleteTrain(trainId);
+  }
+
+  public String getUserRole(String username) {
+    if ("admin".equals(username)) return "ADMIN";
+    return "OPERATOR";
   }
 }

@@ -11,8 +11,8 @@ public interface TicketInterface extends Remote {
   Ticket purchaseTicket(SaleDTO dto) throws RemoteException;
   boolean validateUser(LoginDTO login) throws RemoteException;
   String[] getStationNames() throws RemoteException;
-  void addTrain(Train train) throws RemoteException;
-  Train[] getAllTrains() throws RemoteException;
-  void updateTrain(Train train) throws RemoteException;
-  void deleteTrain(String trainId) throws RemoteException;
+  edu.sebsx.model.list.List<Train> getAllTrains() throws RemoteException;
+  boolean addTrain(Train train) throws RemoteException;
+  boolean updateTrain(Train train) throws RemoteException;
+  boolean deleteTrain(String trainId) throws RemoteException;
 }

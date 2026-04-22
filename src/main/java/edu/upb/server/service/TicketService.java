@@ -58,22 +58,22 @@ public class TicketService extends UnicastRemoteObject implements TicketInterfac
   }
 
   @Override
-  public void addTrain(Train train) throws RemoteException {
-    salesManager.addTrain(train);
-  }
-
-  @Override
-  public Train[] getAllTrains() throws RemoteException {
+  public edu.sebsx.model.list.List<Train> getAllTrains() throws RemoteException {
     return salesManager.getAllTrains();
   }
 
   @Override
-  public void updateTrain(Train train) throws RemoteException {
-    salesManager.updateTrain(train);
+  public boolean addTrain(Train train) throws RemoteException {
+    return salesManager.addTrain(train);
   }
 
   @Override
-  public void deleteTrain(String trainId) throws RemoteException {
-    salesManager.deleteTrain(trainId);
+  public boolean updateTrain(Train train) throws RemoteException {
+    return salesManager.updateTrain(train);
+  }
+
+  @Override
+  public boolean deleteTrain(String trainId) throws RemoteException {
+    return salesManager.deleteTrain(trainId);
   }
 }
