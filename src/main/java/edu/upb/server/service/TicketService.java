@@ -5,17 +5,18 @@ import java.rmi.server.UnicastRemoteObject;
 import edu.upb.common.TicketInterface;
 import edu.upb.common.LoginDTO;
 import edu.upb.common.SaleDTO;
-import edu.upb.model.Ticket;
 import edu.upb.model.Train;
+import edu.upb.model.Ticket;
 import edu.upb.server.business.SalesManager;
 import edu.upb.server.business.SecurityModule;
 import edu.upb.server.persistence.PersistenceModule;
+import edu.sebsx.model.list.List;
 
 public class TicketService extends UnicastRemoteObject implements TicketInterface {
 
-  private SalesManager salesManager;
-  private SecurityModule securityModule;
-  private PersistenceModule persistenceModule;
+  private transient SalesManager salesManager;
+  private transient SecurityModule securityModule;
+  private transient PersistenceModule persistenceModule;
 
   public TicketService() throws RemoteException {
     super();
@@ -34,16 +35,13 @@ public class TicketService extends UnicastRemoteObject implements TicketInterfac
 
   @Override
   public boolean validate(Ticket ticket) throws RemoteException {
-    return persistenceModule.loadTickets()
-            .contains(ticket);
+    return persistenceModule.loadTickets().contains(ticket);
   }
 
   @Override
   public Ticket purchaseTicket(SaleDTO dto) throws RemoteException {
     Ticket ticket = salesManager.processTransaction(dto);
-    if (ticket != null) {
-      persistenceModule.saveTicket(ticket);
-    }
+    if (ticket != null) persistenceModule.saveTicket(ticket);
     return ticket;
   }
 
@@ -58,7 +56,7 @@ public class TicketService extends UnicastRemoteObject implements TicketInterfac
   }
 
   @Override
-  public edu.sebsx.model.list.List<Train> getAllTrains() throws RemoteException {
+  public List<Train> getAllTrains() throws RemoteException {
     return salesManager.getAllTrains();
   }
 
