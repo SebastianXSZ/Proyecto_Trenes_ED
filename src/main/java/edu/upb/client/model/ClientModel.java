@@ -4,6 +4,7 @@ import java.rmi.Naming;
 import edu.upb.common.TicketInterface;
 import edu.upb.common.SaleDTO;
 import edu.upb.common.LoginDTO;
+import edu.upb.model.Passenger;
 import edu.upb.model.Ticket;
 import edu.upb.model.Train;
 import edu.upb.client.observer.Subject;
@@ -124,5 +125,15 @@ public class ClientModel extends Subject {
 
   public String getLogger() {
     return logger;
+  }
+
+  public SinglyLinkedList<Passenger> getBoardingOrder(String trainId) {
+    try {
+      return ticketService.getBoardingOrder(trainId);
+    } catch (Exception e) {
+      logger = "Error fetching boarding order: " + e.getMessage();
+      notifyObservers();
+      return new SinglyLinkedList<>();
+    }
   }
 }
