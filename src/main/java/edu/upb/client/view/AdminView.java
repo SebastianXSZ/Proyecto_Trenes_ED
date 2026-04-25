@@ -134,6 +134,7 @@ public class AdminView extends javax.swing.JFrame {
         tblTrains = new javax.swing.JTable();
         lblMessage = new javax.swing.JLabel();
         btnBoarding = new javax.swing.JButton();
+        btnLogout = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Administración de trenes - UPB");
@@ -208,6 +209,9 @@ public class AdminView extends javax.swing.JFrame {
         btnBoarding.setText("Ver abordaje");
         btnBoarding.addActionListener(this::btnBoardingActionPerformed);
 
+        btnLogout.setText("Cerrar sesión");
+        btnLogout.addActionListener(this::btnLogoutActionPerformed);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -240,10 +244,12 @@ public class AdminView extends javax.swing.JFrame {
                             .addComponent(btnDelete)
                             .addComponent(btnUpdate)
                             .addComponent(btnAdd)))
-                    .addGroup(layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(lblMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnBoarding)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnLogout)
+                            .addComponent(btnBoarding))))
                 .addGap(20, 20, 20))
         );
         layout.setVerticalGroup(
@@ -257,7 +263,7 @@ public class AdminView extends javax.swing.JFrame {
                         .addComponent(btnUpdate)
                         .addGap(21, 21, 21)
                         .addComponent(btnDelete)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 36, Short.MAX_VALUE)
                         .addComponent(btnRefresh)
                         .addGap(27, 27, 27))
                     .addGroup(layout.createSequentialGroup()
@@ -288,7 +294,8 @@ public class AdminView extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(btnBoarding, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(lblMessage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(19, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
+                .addComponent(btnLogout))
         );
 
         pack();
@@ -391,10 +398,17 @@ public class AdminView extends javax.swing.JFrame {
         view.setVisible(true);
     }//GEN-LAST:event_btnBoardingActionPerformed
 
+    private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
+        if (onLogout != null) {
+            onLogout.accept("");
+        }
+    }//GEN-LAST:event_btnLogoutActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnBoarding;
     private javax.swing.JButton btnDelete;
+    private javax.swing.JButton btnLogout;
     private javax.swing.JButton btnRefresh;
     private javax.swing.JButton btnUpdate;
     private javax.swing.JComboBox<String> cmbType;
