@@ -44,7 +44,7 @@ public class ClientController {
   }
 
   private void showPurchaseView() {
-    purchaseView = new PurchaseView(model);
+    purchaseView = new PurchaseView();
     purchaseView.setStationNames(model.getStationNames());
     purchaseView.setPurchaseHandler(this::handlePurchase);
     purchaseView.setVisible(true);
