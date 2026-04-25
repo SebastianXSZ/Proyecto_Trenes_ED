@@ -12,8 +12,10 @@ public class SecurityModule {
   public SecurityModule() {
     this.users = new HashTable<>(16);
     this.sessions = new HashTable<>(16);
-    User admin = new User("1", "admin", hashPassword("admin"), "ADMIN");
+    User admin = new User("1", "admin", hashPassword("upbbga2026*/"), "ADMIN");
+    User operador = new User("2", "operador", hashPassword("upbbgaOp"), "OPERATOR");
     users.put(admin.getUsername(), admin);
+    users.put(operador.getUsername(), operador);
   }
 
   public String hashPassword(String password) {
