@@ -2,6 +2,14 @@ package edu.upb.common;
 
 import java.io.Serializable;
 
+/**
+ * Objeto de transferencia de datos para la compra de boletos.
+ * Encapsula todos los datos necesarios para procesar una venta.
+ * Implementa Serializable para ser transmitido por RMI.
+ *
+ * @author Sebastian Alberto Pinto Torres
+ * @version 1.0
+ */
 public class SaleDTO implements Serializable {
   
   private static final long serialVersionUID = 1L;

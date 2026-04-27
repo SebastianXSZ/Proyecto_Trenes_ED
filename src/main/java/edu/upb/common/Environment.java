@@ -4,6 +4,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
 
+/**
+ * Clase de configuración del entorno de ejecución.
+ * Carga los parámetros de conexión (IP, puerto y nombre del servicio RMI)
+ * desde un archivo de propiedades. Implementa el patrón Singleton.
+ *
+ * @author Sebastian Alberto Pinto Torres
+ * @version 1.0
+ */
 public class Environment {
   private String ip;
   private int port;
