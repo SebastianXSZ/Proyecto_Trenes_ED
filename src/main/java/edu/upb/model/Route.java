@@ -15,11 +15,15 @@ public class Route implements Serializable {
   private String id;
   private SinglyLinkedList<Station> stations;
   private double distance;
+  private String departureTime;
+  private String arrivalTime;
 
   public Route(String id) {
     this.id = id;
     this.stations = new SinglyLinkedList<>();
     this.distance = 0.0;
+    this.departureTime = "";
+    this.arrivalTime = "";
   }
 
   public String getId() {
@@ -40,5 +44,21 @@ public class Route implements Serializable {
 
   public void setDistance(double distance) {
     this.distance = distance;
+  }
+
+  public String getDepartureTime() {
+    return departureTime;
+  }
+
+  public void setDepartureTime(String departureTime) {
+    this.departureTime = departureTime;
+  }
+
+  public String getArrivalTime() {
+    return arrivalTime;
+  }
+
+  public void setArrivalTime(String arrivalTime) {
+    this.arrivalTime = arrivalTime;
   }
 }

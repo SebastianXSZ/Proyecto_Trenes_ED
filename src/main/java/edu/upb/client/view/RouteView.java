@@ -57,7 +57,10 @@ public class RouteView extends javax.swing.JFrame {
                 Iterator<Station> stIt = r.getStations().iterator();
                 if (stIt.hasNext()) origin = stIt.next().getName();
                 if (stIt.hasNext()) dest = stIt.next().getName();
-                tableModel.addRow(new Object[]{r.getId(), origin, dest, r.getDistance()});
+                tableModel.addRow(new Object[]{
+                    r.getId(), origin, dest, r.getDistance(),
+                    r.getDepartureTime(), r.getArrivalTime()
+                });
             }
         } catch (Exception e) {
             lblMessage.setText("Error al cargar rutas: " + e.getMessage());
@@ -69,6 +72,8 @@ public class RouteView extends javax.swing.JFrame {
         cmbOrigin.setSelectedIndex(0);
         cmbDest.setSelectedIndex(0);
         txtDistance.setText("");
+        txtDeparture.setText("");
+        txtArrival.setText("");
         selectedRoute = null;
         tblRoutes.clearSelection();
     }
@@ -111,6 +116,10 @@ public class RouteView extends javax.swing.JFrame {
         scrollPane = new javax.swing.JScrollPane();
         tblRoutes = new javax.swing.JTable();
         lblMessage = new javax.swing.JLabel();
+        lblDeparture = new javax.swing.JLabel();
+        lblArrival = new javax.swing.JLabel();
+        txtDeparture = new javax.swing.JTextField();
+        txtArrival = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Gestión de rutas - UPB");
@@ -138,16 +147,20 @@ public class RouteView extends javax.swing.JFrame {
 
         tblRoutes.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
             },
             new String [] {
-                "ID", "Origen", "Destino", "Distancia (km)"
+                "ID", "Origen", "Destino", "Distancia (km)", "Salida", "Llegada"
             }
         ));
         scrollPane.setViewportView(tblRoutes);
+
+        lblDeparture.setText("Salida (HH:MM):");
+
+        lblArrival.setText("Llegada (HH:MM):");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -155,43 +168,57 @@ public class RouteView extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(scrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addGroup(layout.createSequentialGroup()
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addGroup(layout.createSequentialGroup()
-                                    .addComponent(lblId)
-                                    .addGap(19, 19, 19)
-                                    .addComponent(txtId))
-                                .addGroup(layout.createSequentialGroup()
-                                    .addComponent(lblDistance)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                    .addComponent(txtDistance, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(lblDest)
-                                .addComponent(lblOrigin, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(cmbOrigin, 0, 135, Short.MAX_VALUE)
-                                .addComponent(cmbDest, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 261, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(24, 24, 24)
+                        .addComponent(lblMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 261, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(scrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(33, 33, 33)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(btnAdd)
                                 .addGap(18, 18, 18)
                                 .addComponent(btnUpdate)
                                 .addGap(18, 18, 18)
                                 .addComponent(btnDelete)
                                 .addGap(18, 18, 18)
-                                .addComponent(btnRefresh)))))
-                .addContainerGap(19, Short.MAX_VALUE))
+                                .addComponent(btnRefresh))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(lblDeparture)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(txtDeparture, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                            .addComponent(lblId)
+                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                            .addComponent(lblDistance)
+                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(txtDistance, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(lblDest)
+                                            .addComponent(lblOrigin, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                            .addComponent(cmbOrigin, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .addComponent(cmbDest, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(lblArrival)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(txtArrival, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)))))))
+                .addContainerGap(20, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(11, Short.MAX_VALUE)
+                .addGap(19, 19, 19)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblId)
                     .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -205,6 +232,12 @@ public class RouteView extends javax.swing.JFrame {
                     .addComponent(txtDistance, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblDeparture)
+                    .addComponent(lblArrival)
+                    .addComponent(txtDeparture, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtArrival, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnDelete)
@@ -212,7 +245,8 @@ public class RouteView extends javax.swing.JFrame {
                 .addGap(26, 26, 26)
                 .addComponent(scrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(lblMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(lblMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(12, 12, 12))
         );
 
         pack();
@@ -224,6 +258,8 @@ public class RouteView extends javax.swing.JFrame {
             return;
         }
         selectedRoute.setDistance(Double.parseDouble(txtDistance.getText().trim()));
+        selectedRoute.setDepartureTime(txtDeparture.getText().trim());
+        selectedRoute.setArrivalTime(txtArrival.getText().trim());
         try {
             if (model.updateRoute(selectedRoute)) {
                 loadRoutesToTable();
@@ -269,6 +305,8 @@ public class RouteView extends javax.swing.JFrame {
         route.addStation(new Station((String) cmbOrigin.getSelectedItem(), (String) cmbOrigin.getSelectedItem()));
         route.addStation(new Station((String) cmbDest.getSelectedItem(), (String) cmbDest.getSelectedItem()));
         route.setDistance(Double.parseDouble(txtDistance.getText().trim()));
+        route.setDepartureTime(txtDeparture.getText().trim());
+        route.setArrivalTime(txtArrival.getText().trim());
         try {
             if (model.addRoute(route)) {
                 loadRoutesToTable();
@@ -289,6 +327,8 @@ public class RouteView extends javax.swing.JFrame {
     private javax.swing.JButton btnUpdate;
     private javax.swing.JComboBox<String> cmbDest;
     private javax.swing.JComboBox<String> cmbOrigin;
+    private javax.swing.JLabel lblArrival;
+    private javax.swing.JLabel lblDeparture;
     private javax.swing.JLabel lblDest;
     private javax.swing.JLabel lblDistance;
     private javax.swing.JLabel lblId;
@@ -296,6 +336,8 @@ public class RouteView extends javax.swing.JFrame {
     private javax.swing.JLabel lblOrigin;
     private javax.swing.JScrollPane scrollPane;
     private javax.swing.JTable tblRoutes;
+    private javax.swing.JTextField txtArrival;
+    private javax.swing.JTextField txtDeparture;
     private javax.swing.JTextField txtDistance;
     private javax.swing.JTextField txtId;
     // End of variables declaration//GEN-END:variables
