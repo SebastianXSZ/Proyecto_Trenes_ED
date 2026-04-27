@@ -6,6 +6,12 @@ import edu.upb.server.model.ServerModel;
 import edu.upb.server.model.History;
 import edu.upb.server.view.ServerView;
 
+/**
+ * Fábrica del servidor que crea e interconecta los componentes MVC del servidor.
+ *
+ * @author Sebastian Alberto Pinto Torres
+ * @version 1.0
+ */
 public class ServerFactory {
 
   private ServerFactory() {

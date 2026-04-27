@@ -3,6 +3,13 @@ package edu.upb.server.controller;
 import edu.upb.server.model.ServerModel;
 import edu.upb.server.view.ServerView;
 
+/**
+ * Controlador del servidor en la arquitectura MVC.
+ * Inicializa la vista del servidor y despliega el servicio RMI.
+ *
+ * @author Sebastian Alberto Pinto Torres
+ * @version 1.0
+ */
 public class ServerController {
 
   ServerModel model;

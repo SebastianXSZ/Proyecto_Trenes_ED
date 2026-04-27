@@ -4,6 +4,12 @@ import edu.upb.model.Ticket;
 import edu.sebsx.app.linkedlist.singly.SinglyLinkedList;
 import java.io.*;
 
+/**
+ * Módulo de persistencia para guardar y cargar tickets desde archivos.
+ *
+ * @author Sebastian Alberto Pinto Torres
+ * @version 1.0
+ */
 public class PersistenceModule {
 
   private static final String TICKETS_FILE = "tickets.dat";

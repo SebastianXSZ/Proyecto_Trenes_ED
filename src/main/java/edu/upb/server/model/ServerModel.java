@@ -6,6 +6,13 @@ import edu.upb.common.TicketInterface;
 import edu.upb.server.service.TicketService;
 import edu.upb.server.observer.Subject;
 
+/**
+ * Modelo del servidor en la arquitectura MVC.
+ * Configura y despliega el objeto remoto RMI en el registro.
+ *
+ * @author Sebastian Alberto Pinto Torres
+ * @version 1.0
+ */
 public class ServerModel extends Subject {
 
   private String ip;
