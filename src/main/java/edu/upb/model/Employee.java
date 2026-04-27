@@ -2,6 +2,12 @@ package edu.upb.model;
 
 import java.io.Serializable;
 
+/**
+ * Representa un empleado de la empresa ferroviaria.
+ *
+ * @author Sebastian Alberto Pinto Torres
+ * @version 1.0
+ */
 public class Employee implements Serializable {
   private static final long serialVersionUID = 1L;
 

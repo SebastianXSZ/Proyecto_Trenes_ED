@@ -2,6 +2,12 @@ package edu.upb.model;
 
 import java.io.Serializable;
 
+/**
+ * Representa una estación del sistema ferroviario.
+ *
+ * @author Sebastian Alberto Pinto Torres
+ * @version 1.0
+ */
 public class Station implements Serializable {
   private static final long serialVersionUID = 1L;
 

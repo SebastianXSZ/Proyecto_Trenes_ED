@@ -2,6 +2,12 @@ package edu.upb.model;
 
 import java.io.Serializable;
 
+/**
+ * Representa un cliente del sistema de venta de boletos.
+ *
+ * @author Sebastian Alberto Pinto Torres
+ * @version 1.0
+ */
 public class Customer implements Serializable {
 
   private static final long serialVersionUID = 2L;

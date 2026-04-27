@@ -2,6 +2,12 @@ package edu.upb.model;
 
 import java.io.Serializable;
 
+/**
+ * Representa el equipaje de un pasajero.
+ *
+ * @author Sebastian Alberto Pinto Torres
+ * @version 1.0
+ */
 public class Baggage implements Serializable {
   private static final long serialVersionUID = 1L;
 

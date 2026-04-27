@@ -2,6 +2,12 @@ package edu.upb.model;
 
 import java.io.Serializable;
 
+/**
+ * Representa un usuario del sistema con sus credenciales y rol.
+ *
+ * @author Sebastian Alberto Pinto Torres
+ * @version 1.0
+ */
 public class User implements Serializable {
   private static final long serialVersionUID = 1L;
 

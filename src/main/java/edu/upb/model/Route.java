@@ -3,6 +3,12 @@ package edu.upb.model;
 import java.io.Serializable;
 import edu.sebsx.app.linkedlist.singly.SinglyLinkedList;
 
+/**
+ * Representa una ruta entre estaciones del sistema ferroviario.
+ *
+ * @author Sebastian Alberto Pinto Torres
+ * @version 1.0
+ */
 public class Route implements Serializable {
   private static final long serialVersionUID = 1L;
 
