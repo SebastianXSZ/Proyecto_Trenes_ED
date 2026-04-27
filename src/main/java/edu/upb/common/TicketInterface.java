@@ -6,6 +6,7 @@ import java.rmi.RemoteException;
 import edu.sebsx.app.linkedlist.singly.SinglyLinkedList;
 import edu.sebsx.model.list.List;
 import edu.upb.model.Passenger;
+import edu.upb.model.Route;
 import edu.upb.model.Ticket;
 
 public interface TicketInterface extends Remote {
@@ -19,4 +20,8 @@ public interface TicketInterface extends Remote {
   boolean updateTrain(Train train) throws RemoteException;
   boolean deleteTrain(String trainId) throws RemoteException;
   SinglyLinkedList<Passenger> getBoardingOrder(String trainId) throws RemoteException;
+  List<Route> getAllRoutes() throws RemoteException;
+  boolean addRoute(Route route) throws RemoteException;
+  boolean updateRoute(Route route) throws RemoteException;
+  boolean deleteRoute(String routeId) throws RemoteException;
 }

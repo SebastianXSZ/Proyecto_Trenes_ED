@@ -7,6 +7,7 @@ import edu.upb.common.LoginDTO;
 import edu.upb.common.SaleDTO;
 import edu.upb.model.Train;
 import edu.upb.model.Passenger;
+import edu.upb.model.Route;
 import edu.upb.model.Ticket;
 import edu.upb.server.business.BoardingMonitor;
 import edu.upb.server.business.SalesManager;
@@ -93,5 +94,25 @@ public class TicketService extends UnicastRemoteObject implements TicketInterfac
     if (train == null) return new SinglyLinkedList<>();
     BoardingMonitor monitor = new BoardingMonitor();
     return monitor.getBoardingOrder(train);
+  }
+
+  @Override
+  public List<Route> getAllRoutes() throws RemoteException {
+    return salesManager.getAllRoutes();
+  }
+
+  @Override
+  public boolean addRoute(Route route) throws RemoteException {
+    return salesManager.addRoute(route);
+  }
+
+  @Override
+  public boolean updateRoute(Route route) throws RemoteException {
+    return salesManager.updateRoute(route);
+  }
+
+  @Override
+  public boolean deleteRoute(String routeId) throws RemoteException {
+    return salesManager.deleteRoute(routeId);
   }
 }

@@ -22,12 +22,14 @@ public class SalesManager {
   private HashTable<String, Ticket> ticketCache;
   private GraphMatrix<Station, Double> graph;
   private SinglyLinkedList<Station> stations;
+  private SinglyLinkedList<Route> routes;
 
   public SalesManager() {
     this.fleet = new SinglyLinkedList<>();
     this.ticketCache = new HashTable<>(32);
     this.graph = new GraphMatrix<>(11);
     this.stations = new SinglyLinkedList<>();
+    this.routes = new SinglyLinkedList<>();
     initializeStationsAndGraph();
     initializeTestData();
   }
@@ -35,9 +37,9 @@ public class SalesManager {
   private void initializeStationsAndGraph() {
     String[] names = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"};
     for (String name : names) {
-      Station s = new Station(name, name);
-      stations.add(s);
-      graph.addVertex(s);
+      Station station = new Station(name, name);
+      stations.add(station);
+      graph.addVertex(station);
     }
     double[][] distances = {
       {0, 30, 40, 50, -1, -1, 50, -1, -1, -1, -1},
@@ -63,8 +65,8 @@ public class SalesManager {
     Iterator<Station> it = stations.iterator();
     int i = 0;
     while (it.hasNext()) {
-      Station s = it.next();
-      if (i == index) return s;
+      Station station = it.next();
+      if (i == index) return station;
       i++;
     }
     return null;
@@ -73,8 +75,8 @@ public class SalesManager {
   private Station findStationById(String id) {
     Iterator<Station> it = stations.iterator();
     while (it.hasNext()) {
-      Station s = it.next();
-      if (s.getId().equals(id)) return s;
+      Station station = it.next();
+      if (station.getId().equals(id)) return station;
     }
     return null;
   }
@@ -127,10 +129,10 @@ public class SalesManager {
     SinglyLinkedList<Wagon> wagons = train.getWagons();
     Iterator<Wagon> it = wagons.iterator();
     while (it.hasNext()) {
-      Wagon w = it.next();
-      PassengerWagon pw = (PassengerWagon) w;
+      Wagon wagon = it.next();
+      PassengerWagon pw = (PassengerWagon) wagon;
       String seat = pw.assignSeat(category);
-      if (seat != null) return w.getId() + "-" + seat;
+      if (seat != null) return wagon.getId() + "-" + seat;
     }
     return null;
   }
@@ -152,12 +154,12 @@ public class SalesManager {
     SinglyLinkedList<Train> newList = new SinglyLinkedList<>();
     boolean found = false;
     while (it.hasNext()) {
-      Train t = it.next();
-      if (t.getId().equals(updatedTrain.getId())) {
+      Train train = it.next();
+      if (train.getId().equals(updatedTrain.getId())) {
         newList.add(updatedTrain);
         found = true;
       } else {
-        newList.add(t);
+        newList.add(train);
       }
     }
     if (found) fleet = newList;
@@ -169,11 +171,11 @@ public class SalesManager {
     SinglyLinkedList<Train> newList = new SinglyLinkedList<>();
     boolean found = false;
     while (it.hasNext()) {
-      Train t = it.next();
-      if (t.getId().equals(trainId)) {
+      Train train = it.next();
+      if (train.getId().equals(trainId)) {
         found = true;
       } else {
-        newList.add(t);
+        newList.add(train);
       }
     }
     if (found) fleet = newList;
@@ -183,9 +185,54 @@ public class SalesManager {
   public Train findTrainById(String trainId) {
     Iterator<Train> it = fleet.iterator();
     while (it.hasNext()) {
-      Train t = it.next();
-      if (t.getId().equals(trainId)) return t;
+      Train train = it.next();
+      if (train.getId().equals(trainId)) return train;
     }
     return null;
+  }
+
+  public List<Route> getAllRoutes() {
+    SinglyLinkedList<Route> copy = new SinglyLinkedList<>();
+    Iterator<Route> it = routes.iterator();
+    while (it.hasNext()) copy.add(it.next());
+    return copy;
+  }
+
+  public boolean addRoute(Route route) {
+    routes.add(route);
+    return true;
+  }
+
+  public boolean updateRoute(Route updatedRoute) {
+    Iterator<Route> it = routes.iterator();
+    SinglyLinkedList<Route> newList = new SinglyLinkedList<>();
+    boolean found = false;
+    while (it.hasNext()) {
+      Route route = it.next();
+      if (route.getId().equals(updatedRoute.getId())) {
+        newList.add(updatedRoute);
+        found = true;
+      } else {
+        newList.add(route);
+      }
+    }
+    if (found) routes = newList;
+    return found;
+  }
+
+  public boolean deleteRoute(String routeId) {
+    Iterator<Route> it = routes.iterator();
+    SinglyLinkedList<Route> newList = new SinglyLinkedList<>();
+    boolean found = false;
+    while (it.hasNext()) {
+      Route route = it.next();
+      if (route.getId().equals(routeId)) {
+        found = true;
+      } else {
+        newList.add(route);
+      }
+    }
+    if (found) routes = newList;
+    return found;
   }
 }
