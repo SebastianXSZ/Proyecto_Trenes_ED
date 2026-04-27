@@ -5,6 +5,15 @@ import edu.sebsx.app.hashtable.HashTable;
 import java.security.MessageDigest;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Módulo de seguridad encargado de la autenticación de usuarios y gestión de sesiones.
+ * Almacena las credenciales de los usuarios con hash SHA-256 para proteger las contraseñas.
+ * Proporciona métodos para validar credenciales, obtener roles de usuario,
+ * crear y validar tokens de sesión.
+ *
+ * @author Sebastian Alberto Pinto Torres
+ * @version 1.0
+ */
 public class SecurityModule {
   private HashTable<String, User> users;
   private HashTable<String, String> sessions;

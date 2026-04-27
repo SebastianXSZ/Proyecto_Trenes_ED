@@ -3,6 +3,15 @@ package edu.upb.model;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+/**
+ * Representa un boleto de tren emitido por el sistema.
+ * Contiene toda la información requerida por RF-16:
+ * ID de registro, fechas, datos del pasajero, tren, asiento,
+ * categoría, valor del pasaje y equipaje.
+ * 
+ * @author Sebastian Alberto Pinto Torres
+ * @version 1.0
+ */
 public class Ticket implements Serializable {
   
   private static final long serialVersionUID = 1L;
@@ -122,6 +131,6 @@ public class Ticket implements Serializable {
   }
 
   public String getId() {
-    return registrationId;
+    return getRegistrationId();
   }
 }

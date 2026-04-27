@@ -8,6 +8,15 @@ import edu.sebsx.model.iterator.Iterator;
 import edu.sebsx.model.list.List;
 import edu.sebsx.app.graph.GraphMatrix;
 
+/**
+ * Núcleo de la lógica de negocio del sistema de trenes.
+ * Gestiona la flota de trenes, el procesamiento de compras,
+ * la asignación de asientos y el cálculo de tarifas basado
+ * en el algoritmo de Dijkstra sobre el grafo de estaciones.
+ * 
+ * @author Sebastian Pinto
+ * @version 1.0
+ */
 public class SalesManager {
   private SinglyLinkedList<Train> fleet;
   private HashTable<String, Ticket> ticketCache;

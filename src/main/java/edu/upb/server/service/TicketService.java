@@ -15,6 +15,15 @@ import edu.upb.server.persistence.PersistenceModule;
 import edu.sebsx.app.linkedlist.singly.SinglyLinkedList;
 import edu.sebsx.model.list.List;
 
+/**
+ * Implementación del objeto remoto RMI que expone los servicios del sistema de venta de boletos.
+ * Actúa como fachada del servidor, delegando las operaciones de negocio al SalesManager,
+ * SecurityModule y PersistenceModule. Los métodos aquí definidos pueden ser invocados
+ * remotamente desde el cliente a través de la interfaz TicketInterface.
+ *
+ * @author Sebastian Alberto Pinto Torres
+ * @version 1.0
+ */
 public class TicketService extends UnicastRemoteObject implements TicketInterface {
 
   private transient SalesManager salesManager;

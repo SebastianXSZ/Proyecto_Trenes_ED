@@ -7,6 +7,13 @@ import edu.upb.client.view.AdminView;
 import edu.upb.common.SaleDTO;
 import edu.upb.model.Ticket;
 
+/**
+ * Controlador del cliente en la arquitectura MVC.
+ * Maneja el flujo de navegación entre Login, Compra y Administración según el rol del usuario.
+ *
+ * @author Sebastian Alberto Pinto Torres
+ * @version 1.0
+ */
 public class ClientController {
   private ClientModel model;
   private LoginView loginView;

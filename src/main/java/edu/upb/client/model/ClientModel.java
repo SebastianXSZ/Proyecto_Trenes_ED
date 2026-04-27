@@ -11,6 +11,15 @@ import edu.upb.client.observer.Subject;
 import edu.sebsx.model.list.List;
 import edu.sebsx.app.linkedlist.singly.SinglyLinkedList;
 
+/**
+ * Modelo del cliente en la arquitectura MVC.
+ * Establece la conexión RMI con el servidor y expone métodos para que el controlador
+ * pueda realizar operaciones como iniciar sesión, comprar boletos, gestionar trenes
+ * y consultar el orden de abordaje. Hereda de Subject para notificar cambios a las vistas.
+ *
+ * @author Sebastian Alberto Pinto Torres
+ * @version 1.0
+ */
 public class ClientModel extends Subject {
   private String logger;
   private String uri;

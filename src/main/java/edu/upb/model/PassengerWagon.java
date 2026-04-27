@@ -2,6 +2,14 @@ package edu.upb.model;
 
 import edu.sebsx.app.array.Array;
 
+/**
+ * Vagón de pasajeros con capacidad para 40 personas (2 pilotos, 4 personal de abordo y 34 pasajeros).
+ * Los asientos se distribuyen en 4 lugares para tarifa premium, 8 para tarifa ejecutiva y 22 para tarifa estándar.
+ * Gestiona la asignación de asientos según disponibilidad por categoría.
+ *
+ * @author Sebastian Alberto Pinto Torres
+ * @version 1.0
+ */
 public class PassengerWagon extends Wagon {
   private static final int PREMIUM_SEATS = 4;
   private static final int EXECUTIVE_SEATS = 8;

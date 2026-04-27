@@ -3,6 +3,13 @@ package edu.upb.model;
 import java.io.Serializable;
 import edu.sebsx.app.linkedlist.singly.SinglyLinkedList;
 
+/**
+ * Representa un tren de la flota ferroviaria.
+ * Contiene vagones de pasajeros y de carga.
+ *
+ * @author Sebastian Alberto Pinto Torres
+ * @version 1.0
+ */
 public class Train implements Serializable {
   
   private static final long serialVersionUID = 1L;
