@@ -4,6 +4,12 @@ import edu.upb.client.controller.ClientController;
 import edu.upb.client.model.ClientModel;
 import edu.upb.common.Environment;
 
+/**
+ * Fábrica del cliente que crea e interconecta los componentes MVC del cliente.
+ *
+ * @author Sebastian Alberto Pinto Torres
+ * @version 1.0
+ */
 public class ClientFactory {
 
   private ClientFactory() {

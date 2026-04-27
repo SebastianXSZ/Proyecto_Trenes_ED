@@ -8,8 +8,10 @@ import edu.upb.client.model.ClientModel;
 import java.util.function.Consumer;
 
 /**
+ * Ventana de inicio de sesión del sistema.
  *
- * @author User
+ * @author Sebastian Alberto Pinto Torres
+ * @version 1.0
  */
 public class LoginView extends javax.swing.JFrame {
     

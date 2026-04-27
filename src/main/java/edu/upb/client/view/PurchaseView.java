@@ -10,8 +10,10 @@ import java.util.function.Consumer;
 import javax.swing.JOptionPane;
 
 /**
+ * Ventana de compra de boletos que simula una máquina de estación.
  *
- * @author User
+ * @author Sebastian Alberto Pinto Torres
+ * @version 1.0
  */
 public class PurchaseView extends javax.swing.JFrame {
     

@@ -11,8 +11,10 @@ import edu.upb.model.Passenger;
 import javax.swing.JOptionPane;
 
 /**
+ * Ventana que muestra el orden de abordaje de los pasajeros para un tren específico.
  *
- * @author User
+ * @author Sebastian Alberto Pinto Torres
+ * @version 1.0
  */
 public class BoardingView extends javax.swing.JFrame {
     
