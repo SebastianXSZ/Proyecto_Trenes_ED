@@ -5,6 +5,7 @@ import edu.upb.common.TicketInterface;
 import edu.upb.common.SaleDTO;
 import edu.upb.common.LoginDTO;
 import edu.upb.model.Passenger;
+import edu.upb.model.Route;
 import edu.upb.model.Ticket;
 import edu.upb.model.Train;
 import edu.upb.client.observer.Subject;
@@ -143,6 +144,46 @@ public class ClientModel extends Subject {
       logger = "Error fetching boarding order: " + e.getMessage();
       notifyObservers();
       return new SinglyLinkedList<>();
+    }
+  }
+
+  public List<Route> getAllRoutes() {
+    try {
+      return ticketService.getAllRoutes();
+    } catch (Exception e) {
+      logger = "Error fetching routes: " + e.getMessage();
+      notifyObservers();
+      return new SinglyLinkedList<>();
+    }
+  }
+
+  public boolean addRoute(Route route) {
+    try {
+      return ticketService.addRoute(route);
+    } catch (Exception e) {
+      logger = "Error adding route: " + e.getMessage();
+      notifyObservers();
+      return false;
+    }
+  }
+
+  public boolean updateRoute(Route route) {
+    try {
+      return ticketService.updateRoute(route);
+    } catch (Exception e) {
+      logger = "Error updating route: " + e.getMessage();
+      notifyObservers();
+      return false;
+    }
+  }
+
+  public boolean deleteRoute(String routeId) {
+    try {
+      return ticketService.deleteRoute(routeId);
+    } catch (Exception e) {
+      logger = "Error deleting route: " + e.getMessage();
+      notifyObservers();
+      return false;
     }
   }
 }
