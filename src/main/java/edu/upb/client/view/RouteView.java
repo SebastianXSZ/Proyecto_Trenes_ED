@@ -13,8 +13,10 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
+ * Ventana para la gestión de rutas y horarios del sistema ferroviario.
  *
- * @author User
+ * @author Sebastian Alberto Pinto Torres
+ * @version 1.0
  */
 public class RouteView extends javax.swing.JFrame {
 
