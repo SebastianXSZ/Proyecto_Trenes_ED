@@ -142,7 +142,6 @@ public class AdminView extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Administración de trenes - UPB");
         setPreferredSize(new java.awt.Dimension(392, 300));
-        setResizable(false);
 
         jLabel1.setText("ID:");
         jLabel1.setToolTipText("");
