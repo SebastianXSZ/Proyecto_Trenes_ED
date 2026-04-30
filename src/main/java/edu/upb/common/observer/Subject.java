@@ -1,9 +1,8 @@
-package edu.upb.client.observer;
+package edu.upb.common.observer;
 
 import edu.sebsx.app.linkedlist.singly.SinglyLinkedList;
 
 public abstract class Subject implements Observable {
-
   protected SinglyLinkedList<Observer> observers;
 
   protected Subject() {
@@ -22,8 +21,12 @@ public abstract class Subject implements Observable {
 
   @Override
   public void notifyObservers() {
+    notifyObservers("default");
+  }
+
+  public void notifyObservers(String event) {
     this.observers.forEach(observer -> {
-      observer.update();
+      observer.update(event);
       return null;
     });
   }

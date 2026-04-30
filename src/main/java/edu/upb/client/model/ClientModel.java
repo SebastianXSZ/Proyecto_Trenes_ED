@@ -8,7 +8,7 @@ import edu.upb.model.Passenger;
 import edu.upb.model.Route;
 import edu.upb.model.Ticket;
 import edu.upb.model.Train;
-import edu.upb.client.observer.Subject;
+import edu.upb.common.observer.Subject;
 import edu.sebsx.model.list.List;
 import edu.sebsx.app.linkedlist.singly.SinglyLinkedList;
 
@@ -69,33 +69,14 @@ public class ClientModel extends Subject {
     try {
       return ticketService.getStationNames();
     } catch (Exception e) {
-      this.logger = "Error fetching stations: " + e.getMessage();
-      this.notifyObservers();
+      logger = "Error fetching stations: " + e.getMessage();
+      notifyObservers();
       return new String[0];
     }
   }
 
-  public void register(String names) {
-    try {
-      Ticket ticket = new Ticket();
-      ticket.setPassengerName(names);
-      Ticket registered = ticketService.register(ticket);
-      this.logger = "Registered with ticket: " + registered.getRegistrationId() + " for: " + names;
-      this.notifyObservers();
-    } catch (Exception e) {
-      this.logger = "Registration failed: " + e.getMessage();
-      this.notifyObservers();
-    }
-  }
-
-  public List<Train> getAllTrains() {
-    try {
-      return ticketService.getAllTrains();
-    } catch (Exception e) {
-      logger = "Error fetching trains: " + e.getMessage();
-      notifyObservers();
-      return new SinglyLinkedList<>();
-    }
+  public List<Train> getAllTrains() throws Exception {
+    return ticketService.getAllTrains();
   }
 
   public boolean addTrain(Train train) {
@@ -172,14 +153,8 @@ public class ClientModel extends Subject {
     }
   }
 
-  public List<Route> getAllRoutes() {
-    try {
-      return ticketService.getAllRoutes();
-    } catch (Exception e) {
-      logger = "Error fetching routes: " + e.getMessage();
-      notifyObservers();
-      return new SinglyLinkedList<>();
-    }
+  public List<Route> getAllRoutes() throws Exception {
+    return ticketService.getAllRoutes();
   }
 
   public boolean addRoute(Route route) {

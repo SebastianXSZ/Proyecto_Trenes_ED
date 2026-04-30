@@ -9,8 +9,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
-import edu.upb.server.observer.Observer;
-import edu.upb.server.observer.Subject;
+import edu.upb.common.observer.Observer;
+import edu.upb.common.observer.Subject;
 import edu.upb.server.model.History;
 
 /**
@@ -81,7 +81,7 @@ public class ServerView extends Observer {
   }
 
   @Override
-  public void update() {
+  public void update(String event) {
     console.setText("Status: " + this.getHistory().getLastAction());
   }
 

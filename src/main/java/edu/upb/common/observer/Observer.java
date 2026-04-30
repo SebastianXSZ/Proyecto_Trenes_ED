@@ -1,14 +1,13 @@
-package edu.upb.client.observer;
+package edu.upb.common.observer;
 
 public abstract class Observer {
 
   protected Subject subject;
 
-  protected Observer(Subject subject) {
+  public Observer(Subject subject) {
     this.subject = subject;
     this.subject.attach(this);
   }
 
-  public abstract void update();
-
+  public abstract void update(String event);
 }

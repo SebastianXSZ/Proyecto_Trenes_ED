@@ -1,7 +1,7 @@
 package edu.upb.server.model;
 
 import edu.sebsx.app.stack.list.Stack;
-import edu.upb.server.observer.Subject;
+import edu.upb.common.observer.Subject;
 
 /**
  * Historial de acciones del servidor para auditoría.

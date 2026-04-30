@@ -4,7 +4,7 @@ import java.rmi.Naming;
 import java.rmi.registry.LocateRegistry;
 import edu.upb.common.TicketInterface;
 import edu.upb.server.service.TicketService;
-import edu.upb.server.observer.Subject;
+import edu.upb.common.observer.Subject;
 
 /**
  * Modelo del servidor en la arquitectura MVC.
