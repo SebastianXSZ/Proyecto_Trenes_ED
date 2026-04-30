@@ -17,13 +17,11 @@ public class ServerModel extends Subject {
 
   private String ip;
   private int port;
-  private String serviceName;
   private String uri;
 
   public ServerModel(String ip, int port, String serviceName) {
     this.ip = ip;
     this.port = port;
-    this.serviceName = serviceName;
     this.uri = "rmi://" + ip + ":" + port + "/" + serviceName;
   }
 
