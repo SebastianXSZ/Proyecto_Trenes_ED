@@ -403,6 +403,11 @@ public class AdminView extends javax.swing.JFrame {
         int mileage = Integer.parseInt(txtMileage.getText().trim());
         String type = (String) cmbType.getSelectedItem();
 
+        if (type == null) {
+            lblMessage.setText("Seleccione el tipo de tren.");
+            return;
+        }
+
         Train train;
         if ("Mercedes-Benz".equals(type)) {
             train = new MercedesBenzTrain(id, name, capacity, mileage);
@@ -413,9 +418,11 @@ public class AdminView extends javax.swing.JFrame {
         try {
             boolean success = model.addTrain(train);
             if (success) {
+                filterQuery = "";
+                currentPage = 0;
                 loadTrainsToTable();
                 clearForm();
-                lblMessage.setText("Tren agregado exitosamente.");
+                lblMessage.setText("Tren '" + name + "' agregado exitosamente.");
             } else {
                 lblMessage.setText("Error al agregar el tren.");
             }
@@ -438,6 +445,8 @@ public class AdminView extends javax.swing.JFrame {
         try {
             boolean success = model.updateTrain(selectedTrain);
             if (success) {
+                filterQuery = "";
+                currentPage = 0;
                 loadTrainsToTable();
                 clearForm();
                 lblMessage.setText("Tren actualizado.");
@@ -456,7 +465,7 @@ public class AdminView extends javax.swing.JFrame {
         }
 
         int confirm = JOptionPane.showConfirmDialog(this,
-                "¿Eliminar el tren " + selectedTrain.getName() + "?",
+                "¿Eliminar el tren '" + selectedTrain.getName() + "'?",
                 "Confirmar eliminación",
                 JOptionPane.YES_NO_OPTION);
         if (confirm != JOptionPane.YES_OPTION) return;
@@ -464,6 +473,8 @@ public class AdminView extends javax.swing.JFrame {
         try {
             boolean success = model.deleteTrain(selectedTrain.getId());
             if (success) {
+                filterQuery = "";
+                currentPage = 0;
                 loadTrainsToTable();
                 clearForm();
                 lblMessage.setText("Tren eliminado.");
@@ -476,6 +487,8 @@ public class AdminView extends javax.swing.JFrame {
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
+        filterQuery = "";
+        currentPage = 0;
         loadTrainsToTable();
         clearForm();
         lblMessage.setText("Lista actualizada.");
