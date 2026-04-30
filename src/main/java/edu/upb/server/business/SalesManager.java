@@ -7,6 +7,7 @@ import edu.sebsx.app.hashtable.HashTable;
 import edu.sebsx.model.iterator.Iterator;
 import edu.sebsx.model.list.List;
 import edu.sebsx.app.graph.GraphMatrix;
+import edu.upb.server.persistence.PersistenceModule;
 
 /**
  * Núcleo de la lógica de negocio del sistema de trenes.
@@ -23,15 +24,20 @@ public class SalesManager {
   private GraphMatrix<Station, Double> graph;
   private SinglyLinkedList<Station> stations;
   private SinglyLinkedList<Route> routes;
+  private PersistenceModule persistenceModule;
 
   public SalesManager() {
-    this.fleet = new SinglyLinkedList<>();
+    this.persistenceModule = new PersistenceModule();
+    this.fleet = persistenceModule.loadTrains();
     this.ticketCache = new HashTable<>(32);
     this.graph = new GraphMatrix<>(11);
     this.stations = new SinglyLinkedList<>();
-    this.routes = new SinglyLinkedList<>();
+    this.routes = persistenceModule.loadRoutes();
     initializeStationsAndGraph();
-    initializeTestData();
+    if (this.fleet.isEmpty()) {
+        initializeTestData();
+        persistenceModule.saveTrains(this.fleet);
+    }
   }
 
   private void initializeStationsAndGraph() {
@@ -151,6 +157,7 @@ public class SalesManager {
 
   public boolean addTrain(Train train) {
     fleet.add(train);
+    persistenceModule.saveTrains(fleet);
     return true;
   }
 
@@ -167,7 +174,10 @@ public class SalesManager {
         newList.add(train);
       }
     }
-    if (found) fleet = newList;
+    if (found) {
+      fleet = newList;
+      persistenceModule.saveTrains(fleet);
+    }
     return found;
   }
 
@@ -183,7 +193,10 @@ public class SalesManager {
         newList.add(train);
       }
     }
-    if (found) fleet = newList;
+    if (found) {
+      fleet = newList;
+      persistenceModule.saveTrains(fleet);
+    }
     return found;
   }
 
@@ -205,6 +218,7 @@ public class SalesManager {
 
   public boolean addRoute(Route route) {
     routes.add(route);
+    persistenceModule.saveRoutes(routes);
     return true;
   }
 
@@ -221,7 +235,10 @@ public class SalesManager {
         newList.add(route);
       }
     }
-    if (found) routes = newList;
+    if (found) {
+      routes = newList;
+      persistenceModule.saveRoutes(routes);
+    }
     return found;
   }
 
@@ -237,7 +254,10 @@ public class SalesManager {
         newList.add(route);
       }
     }
-    if (found) routes = newList;
+    if (found) {
+      routes = newList;
+      persistenceModule.saveRoutes(routes);
+    }
     return found;
   }
 }

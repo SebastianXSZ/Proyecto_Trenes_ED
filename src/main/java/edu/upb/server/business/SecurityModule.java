@@ -4,6 +4,9 @@ import edu.upb.model.User;
 import edu.sebsx.app.hashtable.HashTable;
 import java.security.MessageDigest;
 import java.nio.charset.StandardCharsets;
+import edu.upb.server.persistence.PersistenceModule;
+import edu.sebsx.app.linkedlist.singly.SinglyLinkedList;
+import edu.sebsx.model.iterator.Iterator;
 
 /**
  * Módulo de seguridad encargado de la autenticación de usuarios y gestión de sesiones.
@@ -16,12 +19,26 @@ import java.nio.charset.StandardCharsets;
  */
 public class SecurityModule {
   private HashTable<String, User> users;
+  private SinglyLinkedList<User> userList;
+  private PersistenceModule persistenceModule;
   public SecurityModule() {
+    this.persistenceModule = new PersistenceModule();
     this.users = new HashTable<>(16);
-    User admin = new User("1", "admin", hashPassword("1234"), "ADMIN");
-    User operador = new User("2", "operador", hashPassword("123"), "OPERATOR");
-    users.put(admin.getUsername(), admin);
-    users.put(operador.getUsername(), operador);
+    this.userList = persistenceModule.loadUsers();
+    
+    if (userList.isEmpty()) {
+      User admin = new User("1", "admin", hashPassword("1234"), "ADMIN");
+      User operador = new User("2", "operador", hashPassword("123"), "OPERATOR");
+      userList.add(admin);
+      userList.add(operador);
+      persistenceModule.saveUsers(userList);
+    }
+    
+    Iterator<User> it = userList.iterator();
+    while (it.hasNext()) {
+      User u = it.next();
+      users.put(u.getUsername(), u);
+    }
   }
 
   public String hashPassword(String password) {
@@ -61,6 +78,8 @@ public class SecurityModule {
     if (users.get(username) != null) return false;
     User newUser = new User(id, username, hashPassword(password), role);
     users.put(username, newUser);
+    userList.add(newUser);
+    persistenceModule.saveUsers(userList);
     return true;
   }
 
@@ -69,6 +88,7 @@ public class SecurityModule {
     if (user == null) return false;
     if (!user.getPasswordHash().equals(hashPassword(oldPassword))) return false;
     user.setPasswordHash(hashPassword(newPassword));
+    persistenceModule.saveUsers(userList);
     return true;
   }
 }
