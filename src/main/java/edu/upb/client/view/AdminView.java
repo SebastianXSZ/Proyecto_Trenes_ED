@@ -25,6 +25,7 @@ public class AdminView extends javax.swing.JFrame {
     private transient ClientModel model;
     private transient Consumer<String> onLogout;
     private Train selectedTrain = null;
+    private transient List<Train> cachedTrains = null;
     private int currentPage = 0;
     private int pageSize = 5;
     private String filterQuery = "";
@@ -90,10 +91,20 @@ public class AdminView extends javax.swing.JFrame {
                     cmbType.setSelectedItem(tblTrains.getValueAt(selectedRow, 2).toString());
                     txtCapacity.setText(tblTrains.getValueAt(selectedRow, 3).toString());
                     txtMileage.setText(tblTrains.getValueAt(selectedRow, 4).toString());
-                    selectedTrain = model.findTrainById(id);
+                    selectedTrain = findInCache(id);
                 }
             }
         });
+    }
+
+    private Train findInCache(String id) {
+        if (cachedTrains == null) return null;
+        Iterator<Train> it = cachedTrains.iterator();
+        while (it.hasNext()) {
+            Train t = it.next();
+            if (t.getId().equals(id)) return t;
+        }
+        return null;
     }
 
     public void setOnLogout(Consumer<String> handler) {
@@ -102,13 +113,13 @@ public class AdminView extends javax.swing.JFrame {
 
     public void loadTrainsToTable() {
         try {
-            List<Train> trains = model.getAllTrains();
+            cachedTrains = model.getAllTrains();
             DefaultTableModel tableModel = (DefaultTableModel) tblTrains.getModel();
             tableModel.setRowCount(0);
 
             // Contar resultados filtrados
             int count = 0;
-            Iterator<Train> it = trains.iterator();
+            Iterator<Train> it = cachedTrains.iterator();
             while (it.hasNext()) {
                 Train t = it.next();
                 if (matchesFilter(t)) count++;
@@ -123,7 +134,7 @@ public class AdminView extends javax.swing.JFrame {
             int end = Math.min(start + pageSize, count);
 
             // Poblar tabla con los trenes de la página actual
-            it = trains.iterator();
+            it = cachedTrains.iterator();
             int idx = 0;
             while (it.hasNext()) {
                 Train t = it.next();

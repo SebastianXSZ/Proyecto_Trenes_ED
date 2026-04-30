@@ -128,22 +128,6 @@ public class ClientModel extends Subject {
     }
   }
 
-  public Train findTrainById(String trainId) {
-    try {
-      List<Train> trains = ticketService.getAllTrains();
-      edu.sebsx.model.iterator.Iterator<Train> it = trains.iterator();
-      while (it.hasNext()) {
-        Train t = it.next();
-        if (t.getId().equals(trainId)) return t;
-      }
-      return null;
-    } catch (Exception e) {
-      logger = "Error finding train: " + e.getMessage();
-      notifyObservers();
-      return null;
-    }
-  }
-
   public String getUserRole(String username) {
     try {
       return ticketService.getUserRole(username);
