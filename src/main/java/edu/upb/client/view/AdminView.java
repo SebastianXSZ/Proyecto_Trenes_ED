@@ -27,8 +27,8 @@ public class AdminView extends javax.swing.JFrame implements Observer {
     private transient Consumer<String> onLogout;
     private Train selectedTrain = null;
     private transient List<Train> cachedTrains = null;
-    private int currentPage = 0;
-    private int pageSize = 5;
+    private Train selectedTrain = null;
+    private transient List<Train> cachedTrains = null;
     private String filterQuery = "";
 
     /**
@@ -59,34 +59,16 @@ public class AdminView extends javax.swing.JFrame implements Observer {
         javax.swing.JMenuBar menuBar = getJMenuBar();
         if (menuBar == null)
             menuBar = new javax.swing.JMenuBar();
-
-        javax.swing.JMenu menu = new javax.swing.JMenu("Filtros y Paginación");
-
+        javax.swing.JMenu menu = new javax.swing.JMenu("Opciones");
         javax.swing.JMenuItem mnuSearch = new javax.swing.JMenuItem("Buscar Tren");
         mnuSearch.addActionListener(e -> {
             String q = JOptionPane.showInputDialog(this, "ID o Nombre a buscar:", filterQuery);
             if (q != null) {
                 filterQuery = q;
-                currentPage = 0;
                 loadTrainsToTable();
             }
         });
-
-        javax.swing.JMenuItem mnuPrev = new javax.swing.JMenuItem("Página Anterior");
-        mnuPrev.addActionListener(e -> {
-            currentPage--;
-            loadTrainsToTable();
-        });
-
-        javax.swing.JMenuItem mnuNext = new javax.swing.JMenuItem("Página Siguiente");
-        mnuNext.addActionListener(e -> {
-            currentPage++;
-            loadTrainsToTable();
-        });
-
         menu.add(mnuSearch);
-        menu.add(mnuPrev);
-        menu.add(mnuNext);
         menuBar.add(menu);
         setJMenuBar(menuBar);
     }
@@ -374,8 +356,8 @@ public class AdminView extends javax.swing.JFrame implements Observer {
                             .addComponent(btnAdd))
                         .addGap(12, 12, 12))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lblMessage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnBoarding))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(btnRoutes)
@@ -456,9 +438,8 @@ public class AdminView extends javax.swing.JFrame implements Observer {
             boolean success = model.addTrain(train);
             if (success) {
                 filterQuery = "";
-                currentPage = 0;
                 clearForm();
-                lblMessage.setText("Tren '" + name + "' agregado exitosamente.");
+                lblMessage.setText("Tren agregado.");
             } else {
                 lblMessage.setText("Error al agregar el tren.");
             }
@@ -483,7 +464,6 @@ public class AdminView extends javax.swing.JFrame implements Observer {
             boolean success = model.updateTrain(selectedTrain);
             if (success) {
                 filterQuery = "";
-                currentPage = 0;
                 clearForm();
                 lblMessage.setText("Tren actualizado.");
             } else {
@@ -511,7 +491,6 @@ public class AdminView extends javax.swing.JFrame implements Observer {
             boolean success = model.deleteTrain(selectedTrain.getId());
             if (success) {
                 filterQuery = "";
-                currentPage = 0;
                 clearForm();
                 lblMessage.setText("Tren eliminado.");
             } else {
@@ -524,14 +503,10 @@ public class AdminView extends javax.swing.JFrame implements Observer {
 
     private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnRefreshActionPerformed
         filterQuery = "";
-        currentPage = 0;
-        String oldMsg = lblMessage.getText();
+        cachedTrains = null;
         loadTrainsToTable();
         clearForm();
-        // Only set "Lista actualizada" if loadTrainsToTable didn't set an error
-        if (lblMessage.getText().startsWith("Página") || lblMessage.getText().equals(oldMsg)) {
-            lblMessage.setText("Lista actualizada.");
-        }
+        lblMessage.setText("Lista actualizada.");
     }// GEN-LAST:event_btnRefreshActionPerformed
 
     private void btnBoardingActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnBoardingActionPerformed

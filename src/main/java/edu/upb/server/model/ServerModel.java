@@ -24,8 +24,7 @@ public class ServerModel extends Subject {
     this.ip = ip;
     this.port = port;
     this.serviceName = serviceName;
-    this.uri = "//" + ip + ":" + port + "/" + this.serviceName;
-    System.out.println("URI: " + this.uri);
+    this.uri = "rmi://" + ip + ":" + port + "/" + serviceName;
   }
 
   public boolean deploy() {

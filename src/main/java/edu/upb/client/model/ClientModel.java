@@ -37,11 +37,11 @@ public class ClientModel extends Subject {
   public boolean connect() {
     try {
       this.ticketService = (TicketInterface) Naming.lookup(uri);
-      this.logger = "Connected to server at: " + uri;
+      this.logger = "Conectado al servidor en: " + uri;
       notifyObservers("CONNECTED");
       return true;
     } catch (Exception e) {
-      logger = "Error connecting: " + e.getMessage();
+      logger = "Error al conectar: " + e.getMessage();
       notifyObservers("CONNECTION_ERROR");
       return false;
     }
@@ -52,7 +52,7 @@ public class ClientModel extends Subject {
       LoginDTO dto = new LoginDTO(username, password);
       return ticketService.validateUser(dto);
     } catch (Exception e) {
-      logger = "Login failed: " + e.getMessage();
+      logger = "Fallo en el inicio de sesión: " + e.getMessage();
       notifyObservers("LOGIN_ERROR");
       return false;
     }

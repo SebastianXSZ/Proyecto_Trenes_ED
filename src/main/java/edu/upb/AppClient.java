@@ -11,7 +11,7 @@ import edu.upb.client.factory.ClientFactory;
  * @version 1.0
  */
 public class AppClient {
-  public static void main() {
+  public static void main(String[] args) {
     try {
       ClientController client = ClientFactory.create();
       client.init();
