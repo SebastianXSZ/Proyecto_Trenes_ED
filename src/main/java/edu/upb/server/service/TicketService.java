@@ -27,9 +27,9 @@ import edu.sebsx.model.list.List;
  */
 public class TicketService extends UnicastRemoteObject implements TicketInterface {
 
-  private transient SalesManager salesManager;
-  private transient SecurityModule securityModule;
-  private transient PersistenceModule persistenceModule;
+  private SalesManager salesManager;
+  private SecurityModule securityModule;
+  private PersistenceModule persistenceModule;
 
   public TicketService() throws RemoteException {
     super();

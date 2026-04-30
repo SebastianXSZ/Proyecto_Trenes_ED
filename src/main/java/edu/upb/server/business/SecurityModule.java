@@ -16,11 +16,8 @@ import java.nio.charset.StandardCharsets;
  */
 public class SecurityModule {
   private HashTable<String, User> users;
-  private HashTable<String, String> sessions;
-
   public SecurityModule() {
     this.users = new HashTable<>(16);
-    this.sessions = new HashTable<>(16);
     User admin = new User("1", "admin", hashPassword("1234"), "ADMIN");
     User operador = new User("2", "operador", hashPassword("123"), "OPERATOR");
     users.put(admin.getUsername(), admin);
@@ -53,13 +50,7 @@ public class SecurityModule {
   }
 
   public String createSession(String username) {
-    String token = java.util.UUID.randomUUID().toString();
-    sessions.put(token, username);
-    return token;
-  }
-
-  public boolean validateSession(String token) {
-    return sessions.get(token) != null;
+    return java.util.UUID.randomUUID().toString();
   }
 
   public void addUser(User user) {
