@@ -19,16 +19,18 @@ import edu.upb.server.model.History;
  * @author Sebastian Alberto Pinto Torres
  * @version 1.0
  */
-public class ServerView extends Observer {
+public class ServerView implements Observer {
   private String title;
   private JFrame frame;
   private JButton button;
   private JPanel panelButton;
   private JPanel panelConsole;
   private JLabel console;
+  private Subject subject;
 
   public ServerView(String title, Subject subject) {
-    super(subject);
+    this.subject = subject;
+    this.subject.attach(this);
     this.title = title;
     this.frame = new JFrame(this.title);
     this.button = new JButton("Start Server");

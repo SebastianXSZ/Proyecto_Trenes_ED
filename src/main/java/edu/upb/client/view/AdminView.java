@@ -13,6 +13,7 @@ import edu.upb.model.Train;
 import java.util.function.Consumer;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import edu.upb.common.observer.Observer;
 
 /**
  * Ventana de administración para gestionar trenes y ver el orden de abordaje.
@@ -20,7 +21,7 @@ import javax.swing.table.DefaultTableModel;
  * @author Sebastian Alberto Pinto Torres
  * @version 1.0
  */
-public class AdminView extends javax.swing.JFrame {
+public class AdminView extends javax.swing.JFrame implements Observer {
 
     private transient ClientModel model;
     private transient Consumer<String> onLogout;
@@ -39,12 +40,19 @@ public class AdminView extends javax.swing.JFrame {
 
     public AdminView(ClientModel model) {
         this.model = model;
+        this.model.attach(this);
         initComponents();
         setupMenu();
         loadTrainsToTable();
         pack();
         setLocationRelativeTo(null);
         setupTableSelectionListener();
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                model.detach(AdminView.this);
+            }
+        });
     }
 
     private void setupMenu() {
@@ -172,6 +180,15 @@ public class AdminView extends javax.swing.JFrame {
         } catch (Exception e) {
             String errorMsg = "Error al cargar datos: " + e.getMessage();
             lblMessage.setText(errorMsg);
+        }
+    }
+
+    @Override
+    public void update(String event) {
+        if (event.startsWith("TRAIN_") || event.equals("ROUTE_DELETED")) {
+            loadTrainsToTable();
+        } else if (event.equals("ERROR")) {
+            lblMessage.setText(model.getLogger());
         }
     }
 
@@ -441,7 +458,6 @@ public class AdminView extends javax.swing.JFrame {
                 filterQuery = "";
                 currentPage = 0;
                 clearForm();
-                loadTrainsToTable();
                 lblMessage.setText("Tren '" + name + "' agregado exitosamente.");
             } else {
                 lblMessage.setText("Error al agregar el tren.");
@@ -468,7 +484,6 @@ public class AdminView extends javax.swing.JFrame {
             if (success) {
                 filterQuery = "";
                 currentPage = 0;
-                loadTrainsToTable();
                 clearForm();
                 lblMessage.setText("Tren actualizado.");
             } else {
@@ -497,7 +512,6 @@ public class AdminView extends javax.swing.JFrame {
             if (success) {
                 filterQuery = "";
                 currentPage = 0;
-                loadTrainsToTable();
                 clearForm();
                 lblMessage.setText("Tren eliminado.");
             } else {
@@ -531,6 +545,7 @@ public class AdminView extends javax.swing.JFrame {
     }// GEN-LAST:event_btnBoardingActionPerformed
 
     private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnLogoutActionPerformed
+        model.detach(this);
         if (onLogout != null)
             onLogout.accept("");
     }// GEN-LAST:event_btnLogoutActionPerformed

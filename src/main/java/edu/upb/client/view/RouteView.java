@@ -11,6 +11,7 @@ import edu.upb.model.Route;
 import edu.upb.model.Station;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import edu.upb.common.observer.Observer;
 
 /**
  * Ventana para la gestión de rutas y horarios del sistema ferroviario.
@@ -18,7 +19,7 @@ import javax.swing.table.DefaultTableModel;
  * @author Sebastian Alberto Pinto Torres
  * @version 1.0
  */
-public class RouteView extends javax.swing.JFrame {
+public class RouteView extends javax.swing.JFrame implements Observer {
 
     private transient ClientModel model;
     private Route selectedRoute = null;
@@ -32,9 +33,16 @@ public class RouteView extends javax.swing.JFrame {
     
     public RouteView(ClientModel model) {
         this.model = model;
+        this.model.attach(this);
         initComponents();
         setLocationRelativeTo(null);
         loadRoutesToTable();
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                model.detach(RouteView.this);
+            }
+        });
     }
 
     public void setStationNames(String[] stations) {
@@ -46,6 +54,12 @@ public class RouteView extends javax.swing.JFrame {
         }
         this.pack();
         this.setLocationRelativeTo(null);
+    }
+    @Override
+    public void update(String event) {
+        if (event.startsWith("ROUTE_")) {
+            loadRoutesToTable();
+        }
     }
 
     private void loadRoutesToTable() {
@@ -265,7 +279,6 @@ public class RouteView extends javax.swing.JFrame {
         selectedRoute.setArrivalTime(txtArrival.getText().trim());
         try {
             if (model.updateRoute(selectedRoute)) {
-                loadRoutesToTable();
                 clearForm();
                 lblMessage.setText("Ruta actualizada.");
             } else {
@@ -285,7 +298,6 @@ public class RouteView extends javax.swing.JFrame {
         if (confirm != JOptionPane.YES_OPTION) return;
         try {
             if (model.deleteRoute(selectedRoute.getId())) {
-                loadRoutesToTable();
                 clearForm();
                 lblMessage.setText("Ruta eliminada.");
             } else {
@@ -312,7 +324,6 @@ public class RouteView extends javax.swing.JFrame {
         route.setArrivalTime(txtArrival.getText().trim());
         try {
             if (model.addRoute(route)) {
-                loadRoutesToTable();
                 clearForm();
                 lblMessage.setText("Ruta agregada.");
             } else {
