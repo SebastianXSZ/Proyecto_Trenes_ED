@@ -127,7 +127,6 @@ public class RouteView extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Gestión de rutas - UPB");
-        setResizable(false);
 
         lblId.setText("ID Ruta:");
 

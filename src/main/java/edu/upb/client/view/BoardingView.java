@@ -36,11 +36,11 @@ public class BoardingView extends javax.swing.JFrame {
     public void loadBoardingOrder(String trainId) {
         SinglyLinkedList<Passenger> order = model.getBoardingOrder(trainId);
         if (order.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "No hay pasajeros para abordar.");
+            JOptionPane.showMessageDialog(this, "No hay pasajeros registrados para este tren.");
             return;
         }
         StringBuilder sb = new StringBuilder();
-        sb.append("=== ORDEN DE ABORDAJE ===\n");
+        sb.append("=== ORDEN DE ABORDAJE ===\n\n");
         Iterator<Passenger> it = order.iterator();
         int pos = 1;
         while (it.hasNext()) {
@@ -48,6 +48,8 @@ public class BoardingView extends javax.swing.JFrame {
             sb.append(pos++).append(". ").append(p.getName()).append("\n");
         }
         txtOrder.setText(sb.toString());
+        pack();
+        setLocationRelativeTo(null);
     }
 
     /**
@@ -64,7 +66,7 @@ public class BoardingView extends javax.swing.JFrame {
         txtOrder = new javax.swing.JTextArea();
         btnClose = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Monitor de abordaje - UPB");
         setResizable(false);
 

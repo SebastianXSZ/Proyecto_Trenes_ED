@@ -41,6 +41,7 @@ public class AdminView extends javax.swing.JFrame {
         this.model = model;
         initComponents();
         setupMenu();
+        pack();
         setLocationRelativeTo(null);
         setupTableSelectionListener();
     }
@@ -220,7 +221,6 @@ public class AdminView extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Administración de trenes - UPB");
-        setPreferredSize(new java.awt.Dimension(430, 560));
 
         jLabel1.setText("ID:");
         jLabel1.setToolTipText("");
