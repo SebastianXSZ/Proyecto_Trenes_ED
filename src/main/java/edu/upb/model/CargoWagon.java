@@ -11,7 +11,7 @@ import edu.sebsx.app.linkedlist.singly.SinglyLinkedList;
  * @version 1.0
  */
 public class CargoWagon extends Wagon {
-  private SinglyLinkedList<Baggage> storedBaggage;
+  private transient SinglyLinkedList<Baggage> storedBaggage;
 
   public CargoWagon(String id) {
     super(id, "Cargo", 0);
@@ -24,5 +24,28 @@ public class CargoWagon extends Wagon {
 
   public SinglyLinkedList<Baggage> getStoredBaggage() {
     return storedBaggage;
+  }
+
+  private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+    out.defaultWriteObject();
+    int size = 0;
+    if (storedBaggage != null) {
+      edu.sebsx.model.iterator.Iterator<Baggage> it = storedBaggage.iterator();
+      while (it.hasNext()) { it.next(); size++; }
+    }
+    out.writeInt(size);
+    if (storedBaggage != null) {
+      edu.sebsx.model.iterator.Iterator<Baggage> it = storedBaggage.iterator();
+      while (it.hasNext()) { out.writeObject(it.next()); }
+    }
+  }
+
+  private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+    in.defaultReadObject();
+    int size = in.readInt();
+    this.storedBaggage = new SinglyLinkedList<>();
+    for (int i = 0; i < size; i++) {
+      storedBaggage.add((Baggage) in.readObject());
+    }
   }
 }

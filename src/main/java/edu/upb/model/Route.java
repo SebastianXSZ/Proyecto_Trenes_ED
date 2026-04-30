@@ -13,7 +13,7 @@ public class Route implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private String id;
-  private SinglyLinkedList<Station> stations;
+  private transient SinglyLinkedList<Station> stations;
   private double distance;
   private String departureTime;
   private String arrivalTime;
@@ -60,5 +60,28 @@ public class Route implements Serializable {
 
   public void setArrivalTime(String arrivalTime) {
     this.arrivalTime = arrivalTime;
+  }
+
+  private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+    out.defaultWriteObject();
+    int size = 0;
+    if (stations != null) {
+      edu.sebsx.model.iterator.Iterator<Station> it = stations.iterator();
+      while (it.hasNext()) { it.next(); size++; }
+    }
+    out.writeInt(size);
+    if (stations != null) {
+      edu.sebsx.model.iterator.Iterator<Station> it = stations.iterator();
+      while (it.hasNext()) { out.writeObject(it.next()); }
+    }
+  }
+
+  private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+    in.defaultReadObject();
+    int size = in.readInt();
+    this.stations = new SinglyLinkedList<>();
+    for (int i = 0; i < size; i++) {
+      stations.add((Station) in.readObject());
+    }
   }
 }

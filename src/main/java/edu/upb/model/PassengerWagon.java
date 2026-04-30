@@ -15,8 +15,8 @@ public class PassengerWagon extends Wagon {
   private static final int EXECUTIVE_SEATS = 8;
   private static final int STANDARD_SEATS = 22;
 
-  private Array<Passenger> currentPassengers;
-  private Array<String> passengerCategories;
+  private transient Array<Passenger> currentPassengers;
+  private transient Array<String> passengerCategories;
 
   public PassengerWagon(String id) {
     super(id, "Passenger", PREMIUM_SEATS + EXECUTIVE_SEATS + STANDARD_SEATS);
@@ -115,5 +115,26 @@ public class PassengerWagon extends Wagon {
       }
     }
     return "Estándar";
+  }
+
+  private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+    out.defaultWriteObject();
+    int size = currentPassengers.size();
+    out.writeInt(size);
+    for (int i = 0; i < size; i++) {
+      out.writeObject(currentPassengers.get(i));
+      out.writeObject(passengerCategories.get(i));
+    }
+  }
+
+  private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+    in.defaultReadObject();
+    int size = in.readInt();
+    this.currentPassengers = new Array<>(getCapacity());
+    this.passengerCategories = new Array<>(getCapacity());
+    for (int i = 0; i < size; i++) {
+      currentPassengers.add((Passenger) in.readObject());
+      passengerCategories.add((String) in.readObject());
+    }
   }
 }

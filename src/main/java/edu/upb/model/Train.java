@@ -18,7 +18,7 @@ public class Train implements Serializable {
   private String name;
   private double loadCapacity;
   private int mileage;
-  private SinglyLinkedList<Wagon> wagons;
+  private transient SinglyLinkedList<Wagon> wagons;
   
   public Train(String id, String name, double loadCapacity, int mileage) {
     this.id = id;
@@ -72,5 +72,28 @@ public class Train implements Serializable {
   
   public boolean validateWagonLimit() {
     return true;
+  }
+
+  private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+    out.defaultWriteObject();
+    int size = 0;
+    if (wagons != null) {
+      edu.sebsx.model.iterator.Iterator<Wagon> it = wagons.iterator();
+      while (it.hasNext()) { it.next(); size++; }
+    }
+    out.writeInt(size);
+    if (wagons != null) {
+      edu.sebsx.model.iterator.Iterator<Wagon> it = wagons.iterator();
+      while (it.hasNext()) { out.writeObject(it.next()); }
+    }
+  }
+
+  private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+    in.defaultReadObject();
+    int size = in.readInt();
+    this.wagons = new SinglyLinkedList<>();
+    for (int i = 0; i < size; i++) {
+      wagons.add((Wagon) in.readObject());
+    }
   }
 }
