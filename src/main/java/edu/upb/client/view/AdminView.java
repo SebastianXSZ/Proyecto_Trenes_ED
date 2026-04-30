@@ -21,7 +21,7 @@ import javax.swing.table.DefaultTableModel;
  * @version 1.0
  */
 public class AdminView extends javax.swing.JFrame {
-    
+
     private transient ClientModel model;
     private transient Consumer<String> onLogout;
     private Train selectedTrain = null;
@@ -36,11 +36,12 @@ public class AdminView extends javax.swing.JFrame {
     public AdminView() {
         initComponents();
     }
-    
+
     public AdminView(ClientModel model) {
         this.model = model;
         initComponents();
         setupMenu();
+        loadTrainsToTable();
         pack();
         setLocationRelativeTo(null);
         setupTableSelectionListener();
@@ -48,10 +49,11 @@ public class AdminView extends javax.swing.JFrame {
 
     private void setupMenu() {
         javax.swing.JMenuBar menuBar = getJMenuBar();
-        if (menuBar == null) menuBar = new javax.swing.JMenuBar();
-        
+        if (menuBar == null)
+            menuBar = new javax.swing.JMenuBar();
+
         javax.swing.JMenu menu = new javax.swing.JMenu("Filtros y Paginación");
-        
+
         javax.swing.JMenuItem mnuSearch = new javax.swing.JMenuItem("Buscar Tren");
         mnuSearch.addActionListener(e -> {
             String q = JOptionPane.showInputDialog(this, "ID o Nombre a buscar:", filterQuery);
@@ -61,19 +63,19 @@ public class AdminView extends javax.swing.JFrame {
                 loadTrainsToTable();
             }
         });
-        
+
         javax.swing.JMenuItem mnuPrev = new javax.swing.JMenuItem("Página Anterior");
         mnuPrev.addActionListener(e -> {
             currentPage--;
             loadTrainsToTable();
         });
-        
+
         javax.swing.JMenuItem mnuNext = new javax.swing.JMenuItem("Página Siguiente");
         mnuNext.addActionListener(e -> {
             currentPage++;
             loadTrainsToTable();
         });
-        
+
         menu.add(mnuSearch);
         menu.add(mnuPrev);
         menu.add(mnuNext);
@@ -99,11 +101,13 @@ public class AdminView extends javax.swing.JFrame {
     }
 
     private Train findInCache(String id) {
-        if (cachedTrains == null) return null;
+        if (cachedTrains == null)
+            return null;
         Iterator<Train> it = cachedTrains.iterator();
         while (it.hasNext()) {
             Train t = it.next();
-            if (t.getId().equals(id)) return t;
+            if (t.getId().equals(id))
+                return t;
         }
         return null;
     }
@@ -115,54 +119,71 @@ public class AdminView extends javax.swing.JFrame {
     public void loadTrainsToTable() {
         try {
             cachedTrains = model.getAllTrains();
+
             DefaultTableModel tableModel = (DefaultTableModel) tblTrains.getModel();
             tableModel.setRowCount(0);
 
-            // Contar resultados filtrados
+            // Calculate count based on filter
             int count = 0;
-            Iterator<Train> it = cachedTrains.iterator();
-            while (it.hasNext()) {
-                Train t = it.next();
-                if (matchesFilter(t)) count++;
-            }
-
-            int totalPages = (int) Math.ceil((double) count / pageSize);
-            if (totalPages == 0) totalPages = 1;
-            if (currentPage >= totalPages) currentPage = totalPages - 1;
-            if (currentPage < 0) currentPage = 0;
-
-            int start = currentPage * pageSize;
-            int end = Math.min(start + pageSize, count);
-
-            // Poblar tabla con los trenes de la página actual
-            it = cachedTrains.iterator();
-            int idx = 0;
-            while (it.hasNext()) {
-                Train t = it.next();
-                if (matchesFilter(t)) {
-                    if (idx >= start && idx < end) {
-                        String type = (t instanceof MercedesBenzTrain) ? "Mercedes-Benz" : "Arnold";
-                        tableModel.addRow(new Object[]{
-                            t.getId(), t.getName(), type,
-                            t.getLoadCapacity(), t.getMileage()
-                        });
-                    }
-                    idx++;
+            if (cachedTrains != null) {
+                Iterator<Train> countIt = cachedTrains.iterator();
+                while (countIt.hasNext()) {
+                    if (matchesFilter(countIt.next()))
+                        count++;
                 }
             }
 
-            String pageInfo = "Página " + (currentPage + 1) + " de " + totalPages;
-            if (!filterQuery.isEmpty()) pageInfo += " (Filtrado)";
-            lblMessage.setText(pageInfo);
+            int totalPages = (int) Math.ceil((double) count / pageSize);
+            if (totalPages == 0)
+                totalPages = 1;
+            if (currentPage >= totalPages)
+                currentPage = totalPages - 1;
+            if (currentPage < 0)
+                currentPage = 0;
+
+            int start = currentPage * pageSize;
+            int end = Math.min(start + pageSize, count);
+            int idx = 0;
+
+            if (cachedTrains != null) {
+                Iterator<Train> it = cachedTrains.iterator();
+                while (it.hasNext()) {
+                    Train t = it.next();
+                    if (matchesFilter(t)) {
+                        if (idx >= start && idx < end) {
+                            String type = (t instanceof MercedesBenzTrain) ? "Mercedes-Benz" : "Arnold";
+                            tableModel.addRow(new Object[] {
+                                    t.getId(), t.getName(), type,
+                                    t.getLoadCapacity(), t.getMileage()
+                            });
+                        }
+                        idx++;
+                    }
+                }
+            }
+
+            String pageInfo = "Página " + (currentPage + 1) + " de " + totalPages + " (Total: " + count + ")";
+            if (filterQuery != null && !filterQuery.isEmpty())
+                pageInfo += " (Filtrado)";
+
+            if (lblMessage.getText().isEmpty() || lblMessage.getText().startsWith("Página")) {
+                lblMessage.setText(pageInfo);
+            }
         } catch (Exception e) {
-            lblMessage.setText("Error al cargar trenes: " + e.getMessage());
+            String errorMsg = "Error al cargar datos: " + e.getMessage();
+            lblMessage.setText(errorMsg);
         }
     }
 
     private boolean matchesFilter(Train t) {
-        if (filterQuery.isEmpty()) return true;
+        if (filterQuery == null || filterQuery.isEmpty())
+            return true;
+        if (t == null)
+            return false;
         String q = filterQuery.toLowerCase();
-        return t.getName().toLowerCase().contains(q) || t.getId().toLowerCase().contains(q);
+        String name = (t.getName() != null) ? t.getName().toLowerCase() : "";
+        String id = (t.getId() != null) ? t.getId().toLowerCase() : "";
+        return name.contains(q) || id.contains(q);
     }
 
     private void clearForm() {
@@ -189,12 +210,14 @@ public class AdminView extends javax.swing.JFrame {
         }
         return true;
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
      * regenerated by the Form Editor.
      */
 
+    // <editor-fold defaultstate="collapsed" desc="Generated
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -394,34 +417,31 @@ public class AdminView extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
-        if (!validateForm()) return;
-
+    private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnAddActionPerformed
+        if (!validateForm())
+            return;
         String id = txtId.getText().trim();
         String name = txtName.getText().trim();
         double capacity = Double.parseDouble(txtCapacity.getText().trim());
         int mileage = Integer.parseInt(txtMileage.getText().trim());
         String type = (String) cmbType.getSelectedItem();
-
         if (type == null) {
             lblMessage.setText("Seleccione el tipo de tren.");
             return;
         }
-
         Train train;
         if ("Mercedes-Benz".equals(type)) {
             train = new MercedesBenzTrain(id, name, capacity, mileage);
         } else {
             train = new ArnoldTrain(id, name, capacity, mileage);
         }
-
         try {
             boolean success = model.addTrain(train);
             if (success) {
                 filterQuery = "";
                 currentPage = 0;
-                loadTrainsToTable();
                 clearForm();
+                loadTrainsToTable();
                 lblMessage.setText("Tren '" + name + "' agregado exitosamente.");
             } else {
                 lblMessage.setText("Error al agregar el tren.");
@@ -429,14 +449,15 @@ public class AdminView extends javax.swing.JFrame {
         } catch (Exception e) {
             lblMessage.setText("Error: " + e.getMessage());
         }
-    }//GEN-LAST:event_btnAddActionPerformed
+    }// GEN-LAST:event_btnAddActionPerformed
 
-    private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
+    private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnUpdateActionPerformed
         if (selectedTrain == null) {
             lblMessage.setText("Seleccione un tren para actualizar.");
             return;
         }
-        if (!validateForm()) return;
+        if (!validateForm())
+            return;
 
         selectedTrain.setName(txtName.getText().trim());
         selectedTrain.setLoadCapacity(Double.parseDouble(txtCapacity.getText().trim()));
@@ -456,9 +477,9 @@ public class AdminView extends javax.swing.JFrame {
         } catch (Exception e) {
             lblMessage.setText("Error: " + e.getMessage());
         }
-    }//GEN-LAST:event_btnUpdateActionPerformed
+    }// GEN-LAST:event_btnUpdateActionPerformed
 
-    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
+    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnDeleteActionPerformed
         if (selectedTrain == null) {
             lblMessage.setText("Seleccione un tren para eliminar.");
             return;
@@ -468,7 +489,8 @@ public class AdminView extends javax.swing.JFrame {
                 "¿Eliminar el tren '" + selectedTrain.getName() + "'?",
                 "Confirmar eliminación",
                 JOptionPane.YES_NO_OPTION);
-        if (confirm != JOptionPane.YES_OPTION) return;
+        if (confirm != JOptionPane.YES_OPTION)
+            return;
 
         try {
             boolean success = model.deleteTrain(selectedTrain.getId());
@@ -484,17 +506,21 @@ public class AdminView extends javax.swing.JFrame {
         } catch (Exception e) {
             lblMessage.setText("Error: " + e.getMessage());
         }
-    }//GEN-LAST:event_btnDeleteActionPerformed
+    }// GEN-LAST:event_btnDeleteActionPerformed
 
-    private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
+    private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnRefreshActionPerformed
         filterQuery = "";
         currentPage = 0;
+        String oldMsg = lblMessage.getText();
         loadTrainsToTable();
         clearForm();
-        lblMessage.setText("Lista actualizada.");
-    }//GEN-LAST:event_btnRefreshActionPerformed
+        // Only set "Lista actualizada" if loadTrainsToTable didn't set an error
+        if (lblMessage.getText().startsWith("Página") || lblMessage.getText().equals(oldMsg)) {
+            lblMessage.setText("Lista actualizada.");
+        }
+    }// GEN-LAST:event_btnRefreshActionPerformed
 
-    private void btnBoardingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBoardingActionPerformed
+    private void btnBoardingActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnBoardingActionPerformed
         if (selectedTrain == null) {
             lblMessage.setText("Seleccione un tren en la tabla.");
             return;
@@ -502,17 +528,18 @@ public class AdminView extends javax.swing.JFrame {
         BoardingView view = new BoardingView(model);
         view.loadBoardingOrder(selectedTrain.getId());
         view.setVisible(true);
-    }//GEN-LAST:event_btnBoardingActionPerformed
+    }// GEN-LAST:event_btnBoardingActionPerformed
 
-    private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
-        if (onLogout != null) onLogout.accept("");
-    }//GEN-LAST:event_btnLogoutActionPerformed
+    private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnLogoutActionPerformed
+        if (onLogout != null)
+            onLogout.accept("");
+    }// GEN-LAST:event_btnLogoutActionPerformed
 
-    private void btnRoutesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRoutesActionPerformed
+    private void btnRoutesActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnRoutesActionPerformed
         RouteView view = new RouteView(model);
         view.setStationNames(model.getStationNames());
         view.setVisible(true);
-    }//GEN-LAST:event_btnRoutesActionPerformed
+    }// GEN-LAST:event_btnRoutesActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
