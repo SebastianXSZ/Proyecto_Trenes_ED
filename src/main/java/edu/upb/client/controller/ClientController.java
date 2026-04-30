@@ -31,6 +31,16 @@ public class ClientController {
       return;
     }
     loginView = new LoginView(model);
+    loginView.setHandlers(
+      (dto, callback) -> {
+        boolean valid = model.login(dto.getUsername(), dto.getPassword());
+        callback.accept(valid);
+      },
+      (data, callback) -> {
+        boolean success = model.registerUser((String)data[0], (String)data[1], (String)data[2], (String)data[3]);
+        callback.accept(success);
+      }
+    );
     loginView.setOnLoginSuccess(username -> {
       loginView.dispose();
       String role = model.getUserRole(username);
@@ -46,8 +56,13 @@ public class ClientController {
   private void showAdminView(String username) {
     adminView = new AdminView(model);
     adminView.setOnLogout(unused -> logout());
-    adminView.loadTrainsToTable();
     addProfileMenu(adminView, username);
+    adminView.addWindowListener(new java.awt.event.WindowAdapter() {
+        @Override
+        public void windowClosing(java.awt.event.WindowEvent e) {
+            model.detach(adminView);
+        }
+    });
     adminView.setVisible(true);
   }
 

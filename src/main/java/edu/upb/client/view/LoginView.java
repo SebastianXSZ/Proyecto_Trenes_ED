@@ -15,8 +15,9 @@ import java.util.function.Consumer;
  */
 public class LoginView extends javax.swing.JFrame {
     
-    private transient ClientModel model;
     private transient Consumer<String> onLoginSuccess;
+    private transient java.util.function.BiConsumer<edu.upb.common.LoginDTO, Consumer<Boolean>> loginHandler;
+    private transient java.util.function.BiConsumer<Object[], Consumer<Boolean>> registerHandler;
 
     /**
      * Creates new form LoginView
@@ -26,7 +27,6 @@ public class LoginView extends javax.swing.JFrame {
     }
     
     public LoginView(ClientModel model) {
-        this.model = model;
         initComponents();
         
         javax.swing.JMenuBar menuBar = new javax.swing.JMenuBar();
@@ -66,13 +66,22 @@ public class LoginView extends javax.swing.JFrame {
                 javax.swing.JOptionPane.showMessageDialog(this, "Todos los campos son obligatorios.");
                 return;
             }
-            boolean success = model.registerUser(id, user, pass, role);
-            if (success) {
-                javax.swing.JOptionPane.showMessageDialog(this, "Usuario registrado exitosamente.");
-            } else {
-                javax.swing.JOptionPane.showMessageDialog(this, "Error al registrar (el usuario ya existe o error RMI).");
+            if (registerHandler != null) {
+                registerHandler.accept(new Object[]{id, user, pass, role}, success -> {
+                    if (success) {
+                        javax.swing.JOptionPane.showMessageDialog(this, "Usuario registrado exitosamente.");
+                    } else {
+                        javax.swing.JOptionPane.showMessageDialog(this, "Error al registrar (el usuario ya existe o error RMI).");
+                    }
+                });
             }
         }
+    }
+    
+    public void setHandlers(java.util.function.BiConsumer<edu.upb.common.LoginDTO, Consumer<Boolean>> loginHandler, 
+                          java.util.function.BiConsumer<Object[], Consumer<Boolean>> registerHandler) {
+        this.loginHandler = loginHandler;
+        this.registerHandler = registerHandler;
     }
     
     public void setOnLoginSuccess(Consumer<String> handler) {
@@ -204,12 +213,18 @@ public class LoginView extends javax.swing.JFrame {
         }
 
         try {
-            boolean valid = model.login(username, password);
-            if (valid) {
-                jLabel3.setText("");
-                if (onLoginSuccess != null) onLoginSuccess.accept(username);
-            } else {
-                jLabel3.setText("Credenciales inválidas.");
+            if (loginHandler != null) {
+                edu.upb.common.LoginDTO dto = new edu.upb.common.LoginDTO();
+                dto.setUsername(username);
+                dto.setPassword(password);
+                loginHandler.accept(dto, valid -> {
+                    if (valid) {
+                        jLabel3.setText("");
+                        if (onLoginSuccess != null) onLoginSuccess.accept(username);
+                    } else {
+                        jLabel3.setText("Credenciales inválidas.");
+                    }
+                });
             }
         } catch (Exception _) {
             jLabel3.setText("Error de conexión.");

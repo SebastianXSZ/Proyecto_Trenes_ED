@@ -200,8 +200,12 @@ public class PurchaseView extends javax.swing.JFrame {
         double baggage = 0;
         try {
             baggage = Double.parseDouble(txtBaggage.getText().trim());
+            if (baggage <= 0) {
+                JOptionPane.showMessageDialog(this, "El peso del equipaje debe ser mayor a 0.");
+                return;
+            }
         } catch (NumberFormatException _) {
-            JOptionPane.showMessageDialog(this, "Peso de equipaje inválido.");
+            JOptionPane.showMessageDialog(this, "Peso de equipaje inválido (use números).");
             return;
         }
 
@@ -211,7 +215,7 @@ public class PurchaseView extends javax.swing.JFrame {
         dto.setCategory(category);
         dto.setPassengerName(name);
         dto.setBaggageWeight(baggage);
-        dto.setTrainId("TEMP");
+        dto.setTrainId("AUTO"); // El servidor asignará el mejor tren
 
         if (purchaseHandler != null) purchaseHandler.accept(dto);
     }//GEN-LAST:event_btnPurchaseActionPerformed
