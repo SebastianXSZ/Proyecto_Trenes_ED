@@ -14,6 +14,9 @@ public interface TicketInterface extends Remote {
   boolean validate(Ticket ticket) throws RemoteException;
   Ticket purchaseTicket(SaleDTO dto) throws RemoteException;
   boolean validateUser(LoginDTO login) throws RemoteException;
+  String getUserRole(String username) throws RemoteException;
+  boolean registerUser(String id, String username, String password, String role) throws RemoteException;
+  boolean changePassword(String username, String oldPassword, String newPassword) throws RemoteException;
   String[] getStationNames() throws RemoteException;
   List<Train> getAllTrains() throws RemoteException;
   boolean addTrain(Train train) throws RemoteException;

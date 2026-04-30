@@ -34,6 +34,8 @@ public class PurchaseView extends javax.swing.JFrame {
             cmbOrigin.addItem(s);
             cmbDest.addItem(s);
         }
+        this.pack();
+        this.setLocationRelativeTo(null);
     }
     
     public void setPurchaseHandler(Consumer<SaleDTO> handler) {

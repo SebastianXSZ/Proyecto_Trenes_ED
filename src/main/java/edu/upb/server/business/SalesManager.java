@@ -35,24 +35,26 @@ public class SalesManager {
   }
 
   private void initializeStationsAndGraph() {
-    String[] names = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"};
+    String[] names = {"Altea Park", "Belmont Square", "Cambridge Hills", "Davenport Gate", 
+                      "East Hampton", "Fairmont Boulevard", "Grand Avenue", "Highbury Station", 
+                      "Ivy District", "Jade Gardens", "Kensington Way"};
     for (String name : names) {
       Station station = new Station(name, name);
       stations.add(station);
       graph.addVertex(station);
     }
     double[][] distances = {
-      {0, 30, 40, 50, -1, -1, 50, -1, -1, -1, -1},
-      {30, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-      {40, -1, 0, -1, -1, -1, 80, 120, 110, -1, -1},
-      {50, -1, -1, 0, 20, -1, -1, -1, -1, -1, -1},
-      {-1, -1, -1, 20, 0, 65, -1, -1, -1, -1, -1},
-      {-1, -1, -1, -1, 65, 0, 50, 65, 80, -1, -1},
-      {50, -1, 80, -1, -1, 50, 0, 30, -1, -1, 145},
-      {-1, -1, 120, -1, -1, 65, 30, 0, -1, 80, -1},
-      {-1, -1, 110, -1, -1, 80, -1, -1, 0, -1, 145},
-      {-1, -1, -1, -1, -1, -1, -1, 80, -1, 0, 120},
-      {-1, -1, -1, -1, -1, -1, 145, -1, 145, 120, 0}
+      {0, 30, 40, 50, -1, 50, -1, -1, -1, -1, -1}, // A
+      {30, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1}, // B
+      {40, -1, 0, -1, -1, -1, -1, -1, 80, 120, 110}, // C
+      {50, -1, -1, 0, 20, -1, -1, -1, -1, -1, -1}, // D
+      {-1, -1, -1, 20, 0, 65, -1, -1, -1, -1, -1}, // E
+      {50, -1, -1, -1, 65, 0, 80, -1, -1, -1, -1}, // F
+      {-1, -1, -1, -1, -1, 80, 0, 30, 145, -1, -1}, // G
+      {-1, -1, -1, -1, -1, -1, 30, 0, -1, -1, -1}, // H
+      {-1, -1, 80, -1, -1, -1, 145, -1, 0, -1, -1}, // I
+      {-1, -1, 120, -1, -1, -1, -1, -1, -1, 0, -1}, // J
+      {-1, -1, 110, -1, -1, -1, -1, -1, -1, -1, 0}  // K
     };
     for (int i = 0; i < 11; i++) {
       for (int j = 0; j < 11; j++) {
@@ -98,6 +100,7 @@ public class SalesManager {
     String seat = assignSeat(selectedTrain, dto.getCategory());
     if (seat == null) return null;
     double fare = calculateFare(dto.getOrigin(), dto.getDestination());
+    if (fare < 0) return null;
     Ticket ticket = new Ticket();
     ticket.setTrainId(selectedTrain.getId());
     ticket.setPassengerName(dto.getPassengerName());
@@ -109,11 +112,12 @@ public class SalesManager {
   }
 
   private double calculateFare(String originId, String destinationId) {
+    if (originId.equals(destinationId)) return -1.0;
     Station origin = findStationById(originId);
     Station destination = findStationById(destinationId);
-    if (origin == null || destination == null) return 100.0;
+    if (origin == null || destination == null) return -1.0;
     SinglyLinkedList<Station> path = graph.getShortestPath(origin, destination);
-    if (path.isEmpty()) return 100.0;
+    if (path.isEmpty()) return -1.0;
     double totalDistance = 0.0;
     Iterator<Station> it = path.iterator();
     Station prev = null;
@@ -130,9 +134,11 @@ public class SalesManager {
     Iterator<Wagon> it = wagons.iterator();
     while (it.hasNext()) {
       Wagon wagon = it.next();
-      PassengerWagon pw = (PassengerWagon) wagon;
-      String seat = pw.assignSeat(category);
-      if (seat != null) return wagon.getId() + "-" + seat;
+      if (wagon instanceof PassengerWagon) {
+        PassengerWagon pw = (PassengerWagon) wagon;
+        String seat = pw.assignSeat(category);
+        if (seat != null) return wagon.getId() + "-" + seat;
+      }
     }
     return null;
   }

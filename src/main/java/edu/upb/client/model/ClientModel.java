@@ -129,8 +129,33 @@ public class ClientModel extends Subject {
   }
 
   public String getUserRole(String username) {
-    if ("admin".equals(username)) return "ADMIN";
-    return "OPERATOR";
+    try {
+      return ticketService.getUserRole(username);
+    } catch (Exception e) {
+      logger = "Error fetching user role: " + e.getMessage();
+      notifyObservers();
+      return "OPERATOR";
+    }
+  }
+
+  public boolean registerUser(String id, String username, String password, String role) {
+    try {
+      return ticketService.registerUser(id, username, password, role);
+    } catch (Exception e) {
+      logger = "Error registering user: " + e.getMessage();
+      notifyObservers();
+      return false;
+    }
+  }
+
+  public boolean changePassword(String username, String oldPassword, String newPassword) {
+    try {
+      return ticketService.changePassword(username, oldPassword, newPassword);
+    } catch (Exception e) {
+      logger = "Error changing password: " + e.getMessage();
+      notifyObservers();
+      return false;
+    }
   }
 
   public String getLogger() {

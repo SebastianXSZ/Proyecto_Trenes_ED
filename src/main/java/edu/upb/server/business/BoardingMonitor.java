@@ -28,14 +28,16 @@ public class BoardingMonitor {
     Iterator<Wagon> wagonIt = wagons.iterator();
     while (wagonIt.hasNext()) {
       Wagon w = wagonIt.next();
-      PassengerWagon pw = (PassengerWagon) w;
-      Array<Passenger> passengers = pw.getPassengers();
-      for (int i = 0; i < passengers.size(); i++) {
-        Passenger p = passengers.get(i);
-        if (p != null) {
-          String category = pw.getPassengerCategory(p);
-          int priority = getPriority(category);
-          priorityQueue.insert(priority, p);
+      if (w instanceof PassengerWagon) {
+        PassengerWagon pw = (PassengerWagon) w;
+        Array<Passenger> passengers = pw.getPassengers();
+        for (int i = 0; i < passengers.size(); i++) {
+          Passenger p = passengers.get(i);
+          if (p != null) {
+            String category = pw.getPassengerCategory(p);
+            int priority = getPriority(category);
+            priorityQueue.insert(priority, p);
+          }
         }
       }
     }

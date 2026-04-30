@@ -4,6 +4,7 @@
  */
 package edu.upb.client.view;
 
+import edu.sebsx.model.iterator.Iterator;
 import edu.sebsx.model.list.List;
 import edu.upb.client.model.ClientModel;
 import edu.upb.model.ArnoldTrain;
@@ -24,6 +25,9 @@ public class AdminView extends javax.swing.JFrame {
     private transient ClientModel model;
     private transient Consumer<String> onLogout;
     private Train selectedTrain = null;
+    private int currentPage = 0;
+    private int pageSize = 5;
+    private String filterQuery = "";
 
     /**
      * Creates new form AdminView
@@ -35,8 +39,44 @@ public class AdminView extends javax.swing.JFrame {
     public AdminView(ClientModel model) {
         this.model = model;
         initComponents();
+        setupMenu();
         setLocationRelativeTo(null);
         setupTableSelectionListener();
+    }
+
+    private void setupMenu() {
+        javax.swing.JMenuBar menuBar = getJMenuBar();
+        if (menuBar == null) menuBar = new javax.swing.JMenuBar();
+        
+        javax.swing.JMenu menu = new javax.swing.JMenu("Filtros y Paginación");
+        
+        javax.swing.JMenuItem mnuSearch = new javax.swing.JMenuItem("Buscar Tren");
+        mnuSearch.addActionListener(e -> {
+            String q = JOptionPane.showInputDialog(this, "ID o Nombre a buscar:", filterQuery);
+            if (q != null) {
+                filterQuery = q;
+                currentPage = 0;
+                loadTrainsToTable();
+            }
+        });
+        
+        javax.swing.JMenuItem mnuPrev = new javax.swing.JMenuItem("Página Anterior");
+        mnuPrev.addActionListener(e -> {
+            currentPage--;
+            loadTrainsToTable();
+        });
+        
+        javax.swing.JMenuItem mnuNext = new javax.swing.JMenuItem("Página Siguiente");
+        mnuNext.addActionListener(e -> {
+            currentPage++;
+            loadTrainsToTable();
+        });
+        
+        menu.add(mnuSearch);
+        menu.add(mnuPrev);
+        menu.add(mnuNext);
+        menuBar.add(menu);
+        setJMenuBar(menuBar);
     }
 
     private void setupTableSelectionListener() {
@@ -64,22 +104,46 @@ public class AdminView extends javax.swing.JFrame {
             List<Train> trains = model.getAllTrains();
             DefaultTableModel tableModel = (DefaultTableModel) tblTrains.getModel();
             tableModel.setRowCount(0);
-            edu.sebsx.model.iterator.Iterator<Train> it = trains.iterator();
+            
+            int count = 0;
+            Iterator<Train> it = trains.iterator();
             while (it.hasNext()) {
                 Train t = it.next();
-                String type = (t instanceof MercedesBenzTrain) ? "Mercedes-Benz" : "Arnold";
-                tableModel.addRow(new Object[]{
-                    t.getId(),
-                    t.getName(),
-                    type,
-                    t.getLoadCapacity(),
-                    t.getMileage(),
-                    t
-                });
+                if (filterQuery.isEmpty() || t.getName().toLowerCase().contains(filterQuery.toLowerCase()) || t.getId().toLowerCase().contains(filterQuery.toLowerCase())) {
+                    count++;
+                }
+            }
+            
+            int totalPages = (int) Math.ceil((double) count / pageSize);
+            if (currentPage >= totalPages && totalPages > 0) currentPage = totalPages - 1;
+            if (currentPage < 0) currentPage = 0;
+            
+            int start = currentPage * pageSize;
+            int end = Math.min(start + pageSize, count);
+            
+            it = trains.iterator();
+            int currentIndex = 0;
+            while (it.hasNext()) {
+                Train t = it.next();
+                if (filterQuery.isEmpty() || t.getName().toLowerCase().contains(filterQuery.toLowerCase()) || t.getId().toLowerCase().contains(filterQuery.toLowerCase())) {
+                    if (currentIndex >= start && currentIndex < end) {
+                        String type = (t instanceof MercedesBenzTrain) ? "Mercedes-Benz" : "Arnold";
+                        tableModel.addRow(new Object[]{
+                            t.getId(),
+                            t.getName(),
+                            type,
+                            t.getLoadCapacity(),
+                            t.getMileage(),
+                            t
+                        });
+                    }
+                    currentIndex++;
+                }
             }
             tblTrains.getColumnModel().getColumn(5).setMinWidth(0);
             tblTrains.getColumnModel().getColumn(5).setMaxWidth(0);
             tblTrains.getColumnModel().getColumn(5).setWidth(0);
+            lblMessage.setText("Página " + (currentPage + 1) + " de " + Math.max(1, totalPages) + (filterQuery.isEmpty() ? "" : " (Filtrado)"));
         } catch (Exception e) {
             lblMessage.setText("Error al cargar trenes: " + e.getMessage());
         }
@@ -141,7 +205,7 @@ public class AdminView extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Administración de trenes - UPB");
-        setPreferredSize(new java.awt.Dimension(392, 300));
+        setPreferredSize(new java.awt.Dimension(430, 560));
 
         jLabel1.setText("ID:");
         jLabel1.setToolTipText("");
@@ -222,40 +286,45 @@ public class AdminView extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(19, Short.MAX_VALUE)
+                .addContainerGap(23, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jLabel4))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(txtMileage, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtCapacity, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addComponent(txtCapacity, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(cmbType, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(cmbType, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(45, 45, 45)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(btnRefresh)
                             .addComponent(btnDelete)
                             .addComponent(btnUpdate)
-                            .addComponent(btnAdd)
-                            .addComponent(btnRoutes)))
+                            .addComponent(btnAdd))
+                        .addGap(12, 12, 12))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnBoarding))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(55, 55, 55)
+                        .addComponent(btnRoutes)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnLogout)))
                 .addGap(20, 20, 20))
         );
@@ -294,17 +363,17 @@ public class AdminView extends javax.swing.JFrame {
                                 .addGap(6, 6, 6)
                                 .addComponent(jLabel5))
                             .addComponent(cmbType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
-                .addComponent(btnRoutes)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 53, Short.MAX_VALUE)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(lblMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnBoarding))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnLogout)
-                .addGap(0, 2, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnLogout)
+                    .addComponent(btnRoutes))
+                .addGap(0, 5, Short.MAX_VALUE))
         );
 
         pack();

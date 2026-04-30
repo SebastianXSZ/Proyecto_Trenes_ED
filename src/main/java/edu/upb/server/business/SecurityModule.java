@@ -53,7 +53,7 @@ public class SecurityModule {
   }
 
   public String createSession(String username) {
-    String token = username + System.currentTimeMillis();
+    String token = java.util.UUID.randomUUID().toString();
     sessions.put(token, username);
     return token;
   }
@@ -64,5 +64,20 @@ public class SecurityModule {
 
   public void addUser(User user) {
     users.put(user.getUsername(), user);
+  }
+
+  public boolean registerUser(String id, String username, String password, String role) {
+    if (users.get(username) != null) return false;
+    User newUser = new User(id, username, hashPassword(password), role);
+    users.put(username, newUser);
+    return true;
+  }
+
+  public boolean changePassword(String username, String oldPassword, String newPassword) {
+    User user = users.get(username);
+    if (user == null) return false;
+    if (!user.getPasswordHash().equals(hashPassword(oldPassword))) return false;
+    user.setPasswordHash(hashPassword(newPassword));
+    return true;
   }
 }

@@ -35,26 +35,56 @@ public class ClientController {
       loginView.dispose();
       String role = model.getUserRole(username);
       if ("ADMIN".equals(role)) {
-        showAdminView();
+        showAdminView(username);
       } else {
-        showPurchaseView();
+        showPurchaseView(username);
       }
     });
     loginView.setVisible(true);
   }
 
-  private void showAdminView() {
+  private void showAdminView(String username) {
     adminView = new AdminView(model);
     adminView.setOnLogout(unused -> logout());
     adminView.loadTrainsToTable();
+    addProfileMenu(adminView, username);
     adminView.setVisible(true);
   }
 
-  private void showPurchaseView() {
+  private void showPurchaseView(String username) {
     purchaseView = new PurchaseView();
     purchaseView.setStationNames(model.getStationNames());
     purchaseView.setPurchaseHandler(this::handlePurchase);
+    addProfileMenu(purchaseView, username);
     purchaseView.setVisible(true);
+  }
+
+  private void addProfileMenu(javax.swing.JFrame frame, String username) {
+    javax.swing.JMenuBar menuBar = frame.getJMenuBar();
+    if (menuBar == null) menuBar = new javax.swing.JMenuBar();
+    javax.swing.JMenu menu = new javax.swing.JMenu("Perfil (" + username + ")");
+    javax.swing.JMenuItem itemChangePass = new javax.swing.JMenuItem("Cambiar Contraseña");
+    itemChangePass.addActionListener(e -> {
+      javax.swing.JPasswordField txtOld = new javax.swing.JPasswordField();
+      javax.swing.JPasswordField txtNew = new javax.swing.JPasswordField();
+      javax.swing.JPanel panel = new javax.swing.JPanel(new java.awt.GridLayout(0, 1));
+      panel.add(new javax.swing.JLabel("Contraseña Actual:"));
+      panel.add(txtOld);
+      panel.add(new javax.swing.JLabel("Nueva Contraseña:"));
+      panel.add(txtNew);
+      int res = javax.swing.JOptionPane.showConfirmDialog(frame, panel, "Cambiar Contraseña", javax.swing.JOptionPane.OK_CANCEL_OPTION, javax.swing.JOptionPane.PLAIN_MESSAGE);
+      if (res == javax.swing.JOptionPane.OK_OPTION) {
+        boolean success = model.changePassword(username, new String(txtOld.getPassword()), new String(txtNew.getPassword()));
+        if (success) {
+          javax.swing.JOptionPane.showMessageDialog(frame, "Contraseña actualizada exitosamente.");
+        } else {
+          javax.swing.JOptionPane.showMessageDialog(frame, "Error al cambiar contraseña. Verifique sus datos.");
+        }
+      }
+    });
+    menu.add(itemChangePass);
+    menuBar.add(menu);
+    frame.setJMenuBar(menuBar);
   }
 
   private void handlePurchase(SaleDTO dto) {

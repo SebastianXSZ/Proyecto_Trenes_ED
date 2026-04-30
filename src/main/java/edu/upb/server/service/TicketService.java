@@ -64,8 +64,25 @@ public class TicketService extends UnicastRemoteObject implements TicketInterfac
   }
 
   @Override
+  public String getUserRole(String username) throws RemoteException {
+    return securityModule.getRole(username);
+  }
+
+  @Override
+  public boolean registerUser(String id, String username, String password, String role) throws RemoteException {
+    return securityModule.registerUser(id, username, password, role);
+  }
+
+  @Override
+  public boolean changePassword(String username, String oldPassword, String newPassword) throws RemoteException {
+    return securityModule.changePassword(username, oldPassword, newPassword);
+  }
+
+  @Override
   public String[] getStationNames() throws RemoteException {
-    return new String[] {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"};
+    return new String[] {"Altea Park", "Belmont Square", "Cambridge Hills", "Davenport Gate", 
+                         "East Hampton", "Fairmont Boulevard", "Grand Avenue", "Highbury Station", 
+                         "Ivy District", "Jade Gardens", "Kensington Way"};
   }
 
   @Override
