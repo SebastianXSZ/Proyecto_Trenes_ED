@@ -84,12 +84,13 @@ public class AdminView extends javax.swing.JFrame {
             if (!e.getValueIsAdjusting()) {
                 int selectedRow = tblTrains.getSelectedRow();
                 if (selectedRow != -1) {
-                    txtId.setText(tblTrains.getValueAt(selectedRow, 0).toString());
+                    String id = tblTrains.getValueAt(selectedRow, 0).toString();
+                    txtId.setText(id);
                     txtName.setText(tblTrains.getValueAt(selectedRow, 1).toString());
                     cmbType.setSelectedItem(tblTrains.getValueAt(selectedRow, 2).toString());
                     txtCapacity.setText(tblTrains.getValueAt(selectedRow, 3).toString());
                     txtMileage.setText(tblTrains.getValueAt(selectedRow, 4).toString());
-                    selectedTrain = (Train) tblTrains.getValueAt(selectedRow, 5);
+                    selectedTrain = model.findTrainById(id);
                 }
             }
         });
@@ -104,49 +105,52 @@ public class AdminView extends javax.swing.JFrame {
             List<Train> trains = model.getAllTrains();
             DefaultTableModel tableModel = (DefaultTableModel) tblTrains.getModel();
             tableModel.setRowCount(0);
-            
+
+            // Contar resultados filtrados
             int count = 0;
             Iterator<Train> it = trains.iterator();
             while (it.hasNext()) {
                 Train t = it.next();
-                if (filterQuery.isEmpty() || t.getName().toLowerCase().contains(filterQuery.toLowerCase()) || t.getId().toLowerCase().contains(filterQuery.toLowerCase())) {
-                    count++;
-                }
+                if (matchesFilter(t)) count++;
             }
-            
+
             int totalPages = (int) Math.ceil((double) count / pageSize);
-            if (currentPage >= totalPages && totalPages > 0) currentPage = totalPages - 1;
+            if (totalPages == 0) totalPages = 1;
+            if (currentPage >= totalPages) currentPage = totalPages - 1;
             if (currentPage < 0) currentPage = 0;
-            
+
             int start = currentPage * pageSize;
             int end = Math.min(start + pageSize, count);
-            
+
+            // Poblar tabla con los trenes de la página actual
             it = trains.iterator();
-            int currentIndex = 0;
+            int idx = 0;
             while (it.hasNext()) {
                 Train t = it.next();
-                if (filterQuery.isEmpty() || t.getName().toLowerCase().contains(filterQuery.toLowerCase()) || t.getId().toLowerCase().contains(filterQuery.toLowerCase())) {
-                    if (currentIndex >= start && currentIndex < end) {
+                if (matchesFilter(t)) {
+                    if (idx >= start && idx < end) {
                         String type = (t instanceof MercedesBenzTrain) ? "Mercedes-Benz" : "Arnold";
                         tableModel.addRow(new Object[]{
-                            t.getId(),
-                            t.getName(),
-                            type,
-                            t.getLoadCapacity(),
-                            t.getMileage(),
-                            t
+                            t.getId(), t.getName(), type,
+                            t.getLoadCapacity(), t.getMileage()
                         });
                     }
-                    currentIndex++;
+                    idx++;
                 }
             }
-            tblTrains.getColumnModel().getColumn(5).setMinWidth(0);
-            tblTrains.getColumnModel().getColumn(5).setMaxWidth(0);
-            tblTrains.getColumnModel().getColumn(5).setWidth(0);
-            lblMessage.setText("Página " + (currentPage + 1) + " de " + Math.max(1, totalPages) + (filterQuery.isEmpty() ? "" : " (Filtrado)"));
+
+            String pageInfo = "Página " + (currentPage + 1) + " de " + totalPages;
+            if (!filterQuery.isEmpty()) pageInfo += " (Filtrado)";
+            lblMessage.setText(pageInfo);
         } catch (Exception e) {
             lblMessage.setText("Error al cargar trenes: " + e.getMessage());
         }
+    }
+
+    private boolean matchesFilter(Train t) {
+        if (filterQuery.isEmpty()) return true;
+        String q = filterQuery.toLowerCase();
+        return t.getName().toLowerCase().contains(q) || t.getId().toLowerCase().contains(q);
     }
 
     private void clearForm() {
