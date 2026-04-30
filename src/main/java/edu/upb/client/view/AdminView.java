@@ -27,8 +27,6 @@ public class AdminView extends javax.swing.JFrame implements Observer {
     private transient Consumer<String> onLogout;
     private Train selectedTrain = null;
     private transient List<Train> cachedTrains = null;
-    private Train selectedTrain = null;
-    private transient List<Train> cachedTrains = null;
     private String filterQuery = "";
 
     /**
@@ -106,62 +104,35 @@ public class AdminView extends javax.swing.JFrame implements Observer {
         this.onLogout = handler;
     }
 
-    public void loadTrainsToTable() {
+    private void loadTrainsToTable() {
         try {
             cachedTrains = model.getAllTrains();
-
             DefaultTableModel tableModel = (DefaultTableModel) tblTrains.getModel();
             tableModel.setRowCount(0);
 
-            // Calculate count based on filter
             int count = 0;
-            if (cachedTrains != null) {
-                Iterator<Train> countIt = cachedTrains.iterator();
-                while (countIt.hasNext()) {
-                    if (matchesFilter(countIt.next()))
-                        count++;
-                }
-            }
-
-            int totalPages = (int) Math.ceil((double) count / pageSize);
-            if (totalPages == 0)
-                totalPages = 1;
-            if (currentPage >= totalPages)
-                currentPage = totalPages - 1;
-            if (currentPage < 0)
-                currentPage = 0;
-
-            int start = currentPage * pageSize;
-            int end = Math.min(start + pageSize, count);
-            int idx = 0;
-
             if (cachedTrains != null) {
                 Iterator<Train> it = cachedTrains.iterator();
                 while (it.hasNext()) {
                     Train t = it.next();
                     if (matchesFilter(t)) {
-                        if (idx >= start && idx < end) {
-                            String type = (t instanceof MercedesBenzTrain) ? "Mercedes-Benz" : "Arnold";
-                            tableModel.addRow(new Object[] {
-                                    t.getId(), t.getName(), type,
-                                    t.getLoadCapacity(), t.getMileage()
-                            });
-                        }
-                        idx++;
+                        String type = (t instanceof MercedesBenzTrain) ? "Mercedes-Benz" : "Arnold";
+                        tableModel.addRow(new Object[] {
+                                t.getId(), t.getName(), type,
+                                t.getLoadCapacity(), t.getMileage()
+                        });
+                        count++;
                     }
                 }
             }
 
-            String pageInfo = "Página " + (currentPage + 1) + " de " + totalPages + " (Total: " + count + ")";
-            if (filterQuery != null && !filterQuery.isEmpty())
-                pageInfo += " (Filtrado)";
-
-            if (lblMessage.getText().isEmpty() || lblMessage.getText().startsWith("Página")) {
-                lblMessage.setText(pageInfo);
+            String info = "Total: " + count;
+            if (filterQuery != null && !filterQuery.isEmpty()) {
+                info += " (Filtrado)";
             }
+            lblMessage.setText(info);
         } catch (Exception e) {
-            String errorMsg = "Error al cargar datos: " + e.getMessage();
-            lblMessage.setText(errorMsg);
+            lblMessage.setText("Error al cargar datos.");
         }
     }
 
