@@ -3,6 +3,7 @@ package edu.upb.common.observer;
 import edu.sebsx.app.linkedlist.singly.SinglyLinkedList;
 
 public abstract class Subject implements Observable {
+
   protected SinglyLinkedList<Observer> observers;
 
   protected Subject() {

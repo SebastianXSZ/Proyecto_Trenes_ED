@@ -14,9 +14,12 @@ import edu.sebsx.app.linkedlist.singly.SinglyLinkedList;
 
 /**
  * Modelo del cliente en la arquitectura MVC.
- * Establece la conexión RMI con el servidor y expone métodos para que el controlador
- * pueda realizar operaciones como iniciar sesión, comprar boletos, gestionar trenes
- * y consultar el orden de abordaje. Hereda de Subject para notificar cambios a las vistas.
+ * Establece la conexión RMI con el servidor y expone métodos para que el
+ * controlador
+ * pueda realizar operaciones como iniciar sesión, comprar boletos, gestionar
+ * trenes
+ * y consultar el orden de abordaje. Hereda de Subject para notificar cambios a
+ * las vistas.
  *
  * @author Sebastian Alberto Pinto Torres
  * @version 1.0
@@ -35,11 +38,11 @@ public class ClientModel extends Subject {
     try {
       this.ticketService = (TicketInterface) Naming.lookup(uri);
       this.logger = "Connected to server at: " + uri;
-      this.notifyObservers();
+      notifyObservers("CONNECTED");
       return true;
     } catch (Exception e) {
-      this.logger = "Failed to connect: " + e.getMessage();
-      this.notifyObservers();
+      logger = "Error connecting: " + e.getMessage();
+      notifyObservers("CONNECTION_ERROR");
       return false;
     }
   }
@@ -49,8 +52,8 @@ public class ClientModel extends Subject {
       LoginDTO dto = new LoginDTO(username, password);
       return ticketService.validateUser(dto);
     } catch (Exception e) {
-      this.logger = "Login error: " + e.getMessage();
-      this.notifyObservers();
+      logger = "Login failed: " + e.getMessage();
+      notifyObservers("LOGIN_ERROR");
       return false;
     }
   }
@@ -81,30 +84,39 @@ public class ClientModel extends Subject {
 
   public boolean addTrain(Train train) {
     try {
-      return ticketService.addTrain(train);
+      boolean success = ticketService.addTrain(train);
+      if (success)
+        notifyObservers("TRAIN_ADDED");
+      return success;
     } catch (Exception e) {
       logger = "Error adding train: " + e.getMessage();
-      notifyObservers();
+      notifyObservers("ERROR");
       return false;
     }
   }
 
   public boolean updateTrain(Train train) {
     try {
-      return ticketService.updateTrain(train);
+      boolean success = ticketService.updateTrain(train);
+      if (success)
+        notifyObservers("TRAIN_UPDATED");
+      return success;
     } catch (Exception e) {
       logger = "Error updating train: " + e.getMessage();
-      notifyObservers();
+      notifyObservers("ERROR");
       return false;
     }
   }
 
   public boolean deleteTrain(String trainId) {
     try {
-      return ticketService.deleteTrain(trainId);
+      boolean success = ticketService.deleteTrain(trainId);
+      if (success)
+        notifyObservers("TRAIN_DELETED");
+      return success;
     } catch (Exception e) {
       logger = "Error deleting train: " + e.getMessage();
-      notifyObservers();
+      notifyObservers("ERROR");
       return false;
     }
   }
@@ -114,7 +126,7 @@ public class ClientModel extends Subject {
       return ticketService.getUserRole(username);
     } catch (Exception e) {
       logger = "Error fetching user role: " + e.getMessage();
-      notifyObservers();
+      notifyObservers("ERROR");
       return "OPERATOR";
     }
   }
@@ -124,7 +136,7 @@ public class ClientModel extends Subject {
       return ticketService.registerUser(id, username, password, role);
     } catch (Exception e) {
       logger = "Error registering user: " + e.getMessage();
-      notifyObservers();
+      notifyObservers("ERROR");
       return false;
     }
   }
@@ -134,7 +146,7 @@ public class ClientModel extends Subject {
       return ticketService.changePassword(username, oldPassword, newPassword);
     } catch (Exception e) {
       logger = "Error changing password: " + e.getMessage();
-      notifyObservers();
+      notifyObservers("ERROR");
       return false;
     }
   }
@@ -148,7 +160,7 @@ public class ClientModel extends Subject {
       return ticketService.getBoardingOrder(trainId);
     } catch (Exception e) {
       logger = "Error fetching boarding order: " + e.getMessage();
-      notifyObservers();
+      notifyObservers("ERROR");
       return new SinglyLinkedList<>();
     }
   }
@@ -159,30 +171,36 @@ public class ClientModel extends Subject {
 
   public boolean addRoute(Route route) {
     try {
-      return ticketService.addRoute(route);
+      boolean success = ticketService.addRoute(route);
+      if (success) notifyObservers("ROUTE_ADDED");
+      return success;
     } catch (Exception e) {
       logger = "Error adding route: " + e.getMessage();
-      notifyObservers();
+      notifyObservers("ERROR");
       return false;
     }
   }
 
   public boolean updateRoute(Route route) {
     try {
-      return ticketService.updateRoute(route);
+      boolean success = ticketService.updateRoute(route);
+      if (success) notifyObservers("ROUTE_UPDATED");
+      return success;
     } catch (Exception e) {
       logger = "Error updating route: " + e.getMessage();
-      notifyObservers();
+      notifyObservers("ERROR");
       return false;
     }
   }
 
   public boolean deleteRoute(String routeId) {
     try {
-      return ticketService.deleteRoute(routeId);
+      boolean success = ticketService.deleteRoute(routeId);
+      if (success) notifyObservers("ROUTE_DELETED");
+      return success;
     } catch (Exception e) {
       logger = "Error deleting route: " + e.getMessage();
-      notifyObservers();
+      notifyObservers("ERROR");
       return false;
     }
   }
