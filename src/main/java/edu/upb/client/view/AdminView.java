@@ -157,7 +157,8 @@ public class AdminView extends javax.swing.JFrame implements Observer {
             btnNext.setEnabled(end < total);
 
         } catch (Exception e) {
-            lblMessage.setText("Error al cargar datos.");
+            lblMessage.setText("Error al cargar trenes: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -537,10 +538,11 @@ public class AdminView extends javax.swing.JFrame implements Observer {
                 loadTrainsToTable();
                 clearForm();
             } else {
-                lblMessage.setText("Error al agregar el tren.");
+                lblMessage.setText("Error al agregar el tren. Revisa la consola del servidor.");
             }
         } catch (Exception e) {
-            lblMessage.setText("Error: " + e.getMessage());
+            lblMessage.setText("Excepción: " + e.getMessage());
+            e.printStackTrace();
         }
     }// GEN-LAST:event_btnAddActionPerformed
 

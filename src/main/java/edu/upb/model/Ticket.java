@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
  * @version 1.0
  */
 public class Ticket implements Serializable {
-  
+
   private static final long serialVersionUID = 1L;
 
   private String registrationId;
@@ -214,4 +214,4 @@ public class Ticket implements Serializable {
   public String getId() {
     return getRegistrationId();
   }
-}
+}

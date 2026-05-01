@@ -35,7 +35,8 @@ public class PersistenceModule {
   @SuppressWarnings("unchecked")
   public SinglyLinkedList<Ticket> loadTickets() {
     File file = new File(TICKETS_FILE);
-    if (!file.exists()) return new SinglyLinkedList<>();
+    if (!file.exists())
+      return new SinglyLinkedList<>();
     try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
       return (SinglyLinkedList<Ticket>) ois.readObject();
     } catch (Exception e) {
@@ -56,7 +57,8 @@ public class PersistenceModule {
   @SuppressWarnings("unchecked")
   public SinglyLinkedList<Train> loadTrains() {
     File file = new File(TRAINS_FILE);
-    if (!file.exists()) return new SinglyLinkedList<>();
+    if (!file.exists())
+      return new SinglyLinkedList<>();
     try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
       return (SinglyLinkedList<Train>) ois.readObject();
     } catch (Exception e) {
@@ -77,7 +79,8 @@ public class PersistenceModule {
   @SuppressWarnings("unchecked")
   public SinglyLinkedList<Route> loadRoutes() {
     File file = new File(ROUTES_FILE);
-    if (!file.exists()) return new SinglyLinkedList<>();
+    if (!file.exists())
+      return new SinglyLinkedList<>();
     try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
       return (SinglyLinkedList<Route>) ois.readObject();
     } catch (Exception e) {
@@ -98,7 +101,8 @@ public class PersistenceModule {
   @SuppressWarnings("unchecked")
   public SinglyLinkedList<User> loadUsers() {
     File file = new File(USERS_FILE);
-    if (!file.exists()) return new SinglyLinkedList<>();
+    if (!file.exists())
+      return new SinglyLinkedList<>();
     try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
       return (SinglyLinkedList<User>) ois.readObject();
     } catch (Exception e) {
@@ -121,7 +125,8 @@ public class PersistenceModule {
   @SuppressWarnings("unchecked")
   public SinglyLinkedList<edu.upb.model.Employee> loadEmployees() {
     File file = new File(EMPLOYEES_FILE);
-    if (!file.exists()) return new SinglyLinkedList<>();
+    if (!file.exists())
+      return new SinglyLinkedList<>();
     try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
       return (SinglyLinkedList<edu.upb.model.Employee>) ois.readObject();
     } catch (Exception e) {

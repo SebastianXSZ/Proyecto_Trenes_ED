@@ -67,12 +67,17 @@ public class Route implements Serializable {
     int size = 0;
     if (stations != null) {
       edu.sebsx.model.iterator.Iterator<Station> it = stations.iterator();
-      while (it.hasNext()) { it.next(); size++; }
+      while (it.hasNext()) {
+        it.next();
+        size++;
+      }
     }
     out.writeInt(size);
     if (stations != null) {
       edu.sebsx.model.iterator.Iterator<Station> it = stations.iterator();
-      while (it.hasNext()) { out.writeObject(it.next()); }
+      while (it.hasNext()) {
+        out.writeObject(it.next());
+      }
     }
   }
 

@@ -144,7 +144,8 @@ public class ClientModel extends Subject {
   public boolean updateUser(edu.upb.model.User user) {
     try {
       boolean success = ticketService.updateUser(user);
-      if (success) notifyObservers("USER_UPDATED");
+      if (success)
+        notifyObservers("USER_UPDATED");
       return success;
     } catch (Exception e) {
       logger = "Error updating user: " + e.getMessage();
@@ -194,7 +195,8 @@ public class ClientModel extends Subject {
   public boolean addRoute(Route route) {
     try {
       boolean success = ticketService.addRoute(route);
-      if (success) notifyObservers("ROUTE_ADDED");
+      if (success)
+        notifyObservers("ROUTE_ADDED");
       return success;
     } catch (Exception e) {
       logger = "Error adding route: " + e.getMessage();
@@ -206,7 +208,8 @@ public class ClientModel extends Subject {
   public boolean updateRoute(Route route) {
     try {
       boolean success = ticketService.updateRoute(route);
-      if (success) notifyObservers("ROUTE_UPDATED");
+      if (success)
+        notifyObservers("ROUTE_UPDATED");
       return success;
     } catch (Exception e) {
       logger = "Error updating route: " + e.getMessage();
@@ -218,7 +221,8 @@ public class ClientModel extends Subject {
   public boolean deleteRoute(String routeId) {
     try {
       boolean success = ticketService.deleteRoute(routeId);
-      if (success) notifyObservers("ROUTE_DELETED");
+      if (success)
+        notifyObservers("ROUTE_DELETED");
       return success;
     } catch (Exception e) {
       logger = "Error deleting route: " + e.getMessage();
@@ -234,7 +238,8 @@ public class ClientModel extends Subject {
   public boolean addEmployee(edu.upb.model.Employee employee) {
     try {
       boolean success = ticketService.addEmployee(employee);
-      if (success) notifyObservers("EMPLOYEE_ADDED");
+      if (success)
+        notifyObservers("EMPLOYEE_ADDED");
       return success;
     } catch (Exception e) {
       logger = "Error adding employee: " + e.getMessage();
@@ -246,7 +251,8 @@ public class ClientModel extends Subject {
   public boolean updateEmployee(edu.upb.model.Employee employee) {
     try {
       boolean success = ticketService.updateEmployee(employee);
-      if (success) notifyObservers("EMPLOYEE_UPDATED");
+      if (success)
+        notifyObservers("EMPLOYEE_UPDATED");
       return success;
     } catch (Exception e) {
       logger = "Error updating employee: " + e.getMessage();
@@ -258,7 +264,8 @@ public class ClientModel extends Subject {
   public boolean deleteEmployee(String employeeId) {
     try {
       boolean success = ticketService.deleteEmployee(employeeId);
-      if (success) notifyObservers("EMPLOYEE_DELETED");
+      if (success)
+        notifyObservers("EMPLOYEE_DELETED");
       return success;
     } catch (Exception e) {
       logger = "Error deleting employee: " + e.getMessage();

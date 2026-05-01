@@ -17,7 +17,8 @@ public class ClientFactory {
 
   public static ClientController create() {
     Environment env = Environment.getInstance();
-    if (env == null) throw new IllegalStateException("Environment is not initialized");
+    if (env == null)
+      throw new IllegalStateException("Environment is not initialized");
     ClientModel model = new ClientModel(env.getIp(), env.getPort(), env.getServiceName());
     return new ClientController(model);
   }

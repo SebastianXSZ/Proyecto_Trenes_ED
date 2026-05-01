@@ -14,7 +14,8 @@ import edu.upb.common.observer.Subject;
 import edu.upb.server.model.History;
 
 /**
- * Vista del servidor que muestra el estado del servicio RMI y el historial de acciones.
+ * Vista del servidor que muestra el estado del servicio RMI y el historial de
+ * acciones.
  *
  * @author Sebastian Alberto Pinto Torres
  * @version 1.0

@@ -9,7 +9,8 @@ import edu.upb.model.Ticket;
 
 /**
  * Controlador del cliente en la arquitectura MVC.
- * Maneja el flujo de navegación entre Login, Compra y Administración según el rol del usuario.
+ * Maneja el flujo de navegación entre Login, Compra y Administración según el
+ * rol del usuario.
  *
  * @author Sebastian Alberto Pinto Torres
  * @version 1.0
@@ -32,15 +33,15 @@ public class ClientController {
     }
     loginView = new LoginView(model);
     loginView.setHandlers(
-      (dto, callback) -> {
-        boolean valid = model.login(dto.getUsername(), dto.getPassword());
-        callback.accept(valid);
-      },
-      (data, callback) -> {
-        boolean success = model.registerUser((String)data[0], (String)data[1], (String)data[2], (String)data[3], (String)data[4], (String)data[5]);
-        callback.accept(success);
-      }
-    );
+        (dto, callback) -> {
+          boolean valid = model.login(dto.getUsername(), dto.getPassword());
+          callback.accept(valid);
+        },
+        (data, callback) -> {
+          boolean success = model.registerUser((String) data[0], (String) data[1], (String) data[2], (String) data[3],
+              (String) data[4], (String) data[5]);
+          callback.accept(success);
+        });
     loginView.setOnLoginSuccess(username -> {
       loginView.dispose();
       String role = model.getUserRole(username);
@@ -58,10 +59,10 @@ public class ClientController {
     adminView.setOnLogout(unused -> logout());
     addProfileMenu(adminView, username);
     adminView.addWindowListener(new java.awt.event.WindowAdapter() {
-        @Override
-        public void windowClosing(java.awt.event.WindowEvent e) {
-            logout();
-        }
+      @Override
+      public void windowClosing(java.awt.event.WindowEvent e) {
+        logout();
+      }
     });
     adminView.setVisible(true);
   }
@@ -72,28 +73,30 @@ public class ClientController {
     purchaseView.setPurchaseHandler(this::handlePurchase);
     addProfileMenu(purchaseView, username);
     purchaseView.addWindowListener(new java.awt.event.WindowAdapter() {
-        @Override
-        public void windowClosing(java.awt.event.WindowEvent e) {
-            logout();
-        }
+      @Override
+      public void windowClosing(java.awt.event.WindowEvent e) {
+        logout();
+      }
     });
     purchaseView.setVisible(true);
   }
 
   private void addProfileMenu(javax.swing.JFrame frame, String username) {
     javax.swing.JMenuBar menuBar = frame.getJMenuBar();
-    if (menuBar == null) menuBar = new javax.swing.JMenuBar();
-    
+    if (menuBar == null)
+      menuBar = new javax.swing.JMenuBar();
+
     edu.upb.model.User currentUser = model.getUser(username);
     String role = currentUser != null ? currentUser.getRole() : "UNKNOWN";
-    
+
     javax.swing.JMenu menu = new javax.swing.JMenu("Perfil (" + username + " - " + role + ")");
-    
+
     javax.swing.JMenuItem itemEditProfile = new javax.swing.JMenuItem("Editar Perfil");
     itemEditProfile.addActionListener(e -> {
       edu.upb.model.User user = model.getUser(username);
-      if (user == null) return;
-      
+      if (user == null)
+        return;
+
       javax.swing.JTextField txtName = new javax.swing.JTextField(user.getName());
       javax.swing.JTextField txtLastName = new javax.swing.JTextField(user.getLastName());
       javax.swing.JPanel panel = new javax.swing.JPanel(new java.awt.GridLayout(0, 1));
@@ -101,8 +104,9 @@ public class ClientController {
       panel.add(txtName);
       panel.add(new javax.swing.JLabel("Apellido:"));
       panel.add(txtLastName);
-      
-      int res = javax.swing.JOptionPane.showConfirmDialog(frame, panel, "Editar Perfil", javax.swing.JOptionPane.OK_CANCEL_OPTION, javax.swing.JOptionPane.PLAIN_MESSAGE);
+
+      int res = javax.swing.JOptionPane.showConfirmDialog(frame, panel, "Editar Perfil",
+          javax.swing.JOptionPane.OK_CANCEL_OPTION, javax.swing.JOptionPane.PLAIN_MESSAGE);
       if (res == javax.swing.JOptionPane.OK_OPTION) {
         user.setName(txtName.getText().trim());
         user.setLastName(txtLastName.getText().trim());
@@ -113,7 +117,7 @@ public class ClientController {
         }
       }
     });
-    
+
     javax.swing.JMenuItem itemChangePass = new javax.swing.JMenuItem("Cambiar Contraseña");
     itemChangePass.addActionListener(e -> {
       javax.swing.JPasswordField txtOld = new javax.swing.JPasswordField();
@@ -123,9 +127,11 @@ public class ClientController {
       panel.add(txtOld);
       panel.add(new javax.swing.JLabel("Nueva Contraseña:"));
       panel.add(txtNew);
-      int res = javax.swing.JOptionPane.showConfirmDialog(frame, panel, "Cambiar Contraseña", javax.swing.JOptionPane.OK_CANCEL_OPTION, javax.swing.JOptionPane.PLAIN_MESSAGE);
+      int res = javax.swing.JOptionPane.showConfirmDialog(frame, panel, "Cambiar Contraseña",
+          javax.swing.JOptionPane.OK_CANCEL_OPTION, javax.swing.JOptionPane.PLAIN_MESSAGE);
       if (res == javax.swing.JOptionPane.OK_OPTION) {
-        boolean success = model.changePassword(username, new String(txtOld.getPassword()), new String(txtNew.getPassword()));
+        boolean success = model.changePassword(username, new String(txtOld.getPassword()),
+            new String(txtNew.getPassword()));
         if (success) {
           javax.swing.JOptionPane.showMessageDialog(frame, "Contraseña actualizada exitosamente.");
         } else {
@@ -153,8 +159,10 @@ public class ClientController {
   }
 
   private void logout() {
-    if (adminView != null) adminView.dispose();
-    if (purchaseView != null) purchaseView.dispose();
+    if (adminView != null)
+      adminView.dispose();
+    if (purchaseView != null)
+      purchaseView.dispose();
     init();
   }
 }

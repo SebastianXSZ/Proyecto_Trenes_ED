@@ -31,12 +31,17 @@ public class CargoWagon extends Wagon {
     int size = 0;
     if (storedBaggage != null) {
       edu.sebsx.model.iterator.Iterator<Baggage> it = storedBaggage.iterator();
-      while (it.hasNext()) { it.next(); size++; }
+      while (it.hasNext()) {
+        it.next();
+        size++;
+      }
     }
     out.writeInt(size);
     if (storedBaggage != null) {
       edu.sebsx.model.iterator.Iterator<Baggage> it = storedBaggage.iterator();
-      while (it.hasNext()) { out.writeObject(it.next()); }
+      while (it.hasNext()) {
+        out.writeObject(it.next());
+      }
     }
   }
 

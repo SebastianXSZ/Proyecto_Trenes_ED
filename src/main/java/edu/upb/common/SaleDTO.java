@@ -11,9 +11,9 @@ import java.io.Serializable;
  * @version 1.0
  */
 public class SaleDTO implements Serializable {
-  
+
   private static final long serialVersionUID = 1L;
-  
+
   private String trainId;
   private String origin;
   private String destination;
@@ -29,10 +29,13 @@ public class SaleDTO implements Serializable {
   private String category;
   private String userId;
   private double baggageWeight;
-  
-  public SaleDTO() {}
-  
-  public SaleDTO(String trainId, String origin, String destination, String passengerName, String passengerLastName, String passengerId, String idType, String address, String phoneNumbers, String contactPersonName, String contactPersonLastName, String contactPersonPhone, String category, String userId, double baggageWeight) {
+
+  public SaleDTO() {
+  }
+
+  public SaleDTO(String trainId, String origin, String destination, String passengerName, String passengerLastName,
+      String passengerId, String idType, String address, String phoneNumbers, String contactPersonName,
+      String contactPersonLastName, String contactPersonPhone, String category, String userId, double baggageWeight) {
     this.trainId = trainId;
     this.origin = origin;
     this.destination = destination;
@@ -49,35 +52,35 @@ public class SaleDTO implements Serializable {
     this.userId = userId;
     this.baggageWeight = baggageWeight;
   }
-  
+
   public String getTrainId() {
     return trainId;
   }
-  
+
   public void setTrainId(String trainId) {
     this.trainId = trainId;
   }
-  
+
   public String getOrigin() {
     return origin;
   }
-  
+
   public void setOrigin(String origin) {
     this.origin = origin;
   }
-  
+
   public String getDestination() {
     return destination;
   }
-  
+
   public void setDestination(String destination) {
     this.destination = destination;
   }
-  
+
   public String getPassengerName() {
     return passengerName;
   }
-  
+
   public void setPassengerName(String passengerName) {
     this.passengerName = passengerName;
   }
@@ -145,27 +148,27 @@ public class SaleDTO implements Serializable {
   public void setContactPersonPhone(String contactPersonPhone) {
     this.contactPersonPhone = contactPersonPhone;
   }
-  
+
   public String getCategory() {
     return category;
   }
-  
+
   public void setCategory(String category) {
     this.category = category;
   }
-  
+
   public String getUserId() {
     return userId;
   }
-  
+
   public void setUserId(String userId) {
     this.userId = userId;
   }
-  
+
   public double getBaggageWeight() {
     return baggageWeight;
   }
-  
+
   public void setBaggageWeight(double baggageWeight) {
     this.baggageWeight = baggageWeight;
   }

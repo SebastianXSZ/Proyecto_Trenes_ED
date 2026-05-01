@@ -25,7 +25,8 @@ public class History extends Subject {
   }
 
   public String getLastAction() {
-    if (actions.isEmpty()) return "No actions yet.";
+    if (actions.isEmpty())
+      return "No actions yet.";
     Action lastAction = actions.peek();
     return lastAction.getTimestamp() + ": " + lastAction.getDescription();
   }

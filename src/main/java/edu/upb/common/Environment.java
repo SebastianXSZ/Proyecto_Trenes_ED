@@ -18,18 +18,18 @@ public class Environment {
   private String serviceName;
   private static final String CONFIG_FILE_PATH = "config.properties";
   private static Environment instance;
-  
+
   private Environment() {
     System.setProperty("config.file.path", CONFIG_FILE_PATH);
     loadConfig();
-    this.ip = System.getProperty("server.ip", 
+    this.ip = System.getProperty("server.ip",
         System.getenv().getOrDefault("SERVER_IP", "localhost"));
-    this.port = Integer.parseInt(System.getProperty("server.port", 
+    this.port = Integer.parseInt(System.getProperty("server.port",
         System.getenv().getOrDefault("SERVER_PORT", "1099")));
-    this.serviceName = System.getProperty("server.name", 
+    this.serviceName = System.getProperty("server.name",
         System.getenv().getOrDefault("SERVER_NAME", "TicketService"));
   }
-  
+
   private void loadConfig() {
     Properties config = new Properties();
     try (FileInputStream fin = new FileInputStream(new File(
@@ -42,22 +42,22 @@ public class Environment {
       e.printStackTrace();
     }
   }
-  
+
   public static Environment getInstance() {
     if (instance == null) {
       instance = new Environment();
     }
     return instance;
   }
-  
+
   public String getIp() {
     return ip;
   }
-  
+
   public int getPort() {
     return port;
   }
-  
+
   public String getServiceName() {
     return serviceName;
   }

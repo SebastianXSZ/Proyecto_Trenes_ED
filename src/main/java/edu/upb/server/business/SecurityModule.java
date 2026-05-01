@@ -9,8 +9,10 @@ import edu.sebsx.app.linkedlist.singly.SinglyLinkedList;
 import edu.sebsx.model.iterator.Iterator;
 
 /**
- * Módulo de seguridad encargado de la autenticación de usuarios y gestión de sesiones.
- * Almacena las credenciales de los usuarios con hash SHA-256 para proteger las contraseñas.
+ * Módulo de seguridad encargado de la autenticación de usuarios y gestión de
+ * sesiones.
+ * Almacena las credenciales de los usuarios con hash SHA-256 para proteger las
+ * contraseñas.
  * Proporciona métodos para validar credenciales, obtener roles de usuario,
  * crear y validar tokens de sesión.
  *
@@ -18,27 +20,25 @@ import edu.sebsx.model.iterator.Iterator;
  * @version 1.0
  */
 public class SecurityModule {
+
   private HashTable<String, User> users;
   private SinglyLinkedList<User> userList;
   private PersistenceModule persistenceModule;
+
   public SecurityModule() {
     this.persistenceModule = new PersistenceModule();
     this.users = new HashTable<>(16);
-    this.userList = persistenceModule.loadUsers();
-    
-    if (userList.isEmpty()) {
-      User admin = new User("1", "admin", hashPassword("1234"), "ADMIN", "Admin", "UPB");
-      User operador = new User("2", "operador", hashPassword("123"), "OPERATOR", "Operador", "UPB");
-      userList.add(admin);
-      userList.add(operador);
-      persistenceModule.saveUsers(userList);
-    }
-    
+    this.userList = new SinglyLinkedList<>();
+    User admin = new User("1", "admin", hashPassword("1234"), "ADMIN", "Admin", "UPB");
+    User operador = new User("2", "operador", hashPassword("123"), "OPERATOR", "Operador", "UPB");
+    userList.add(admin);
+    userList.add(operador);
     Iterator<User> it = userList.iterator();
     while (it.hasNext()) {
       User u = it.next();
       users.put(u.getUsername(), u);
     }
+    persistenceModule.saveUsers(userList);
   }
 
   public String hashPassword(String password) {
@@ -46,9 +46,8 @@ public class SecurityModule {
       MessageDigest md = MessageDigest.getInstance("SHA-256");
       byte[] hash = md.digest(password.getBytes(StandardCharsets.UTF_8));
       StringBuilder hex = new StringBuilder();
-      for (byte b : hash) {
+      for (byte b : hash)
         hex.append(String.format("%02x", b));
-      }
       return hex.toString();
     } catch (Exception e) {
       throw new RuntimeException("Error hashing password", e);
@@ -57,7 +56,8 @@ public class SecurityModule {
 
   public boolean validateUser(String username, String password) {
     User user = users.get(username);
-    if (user == null) return false;
+    if (user == null)
+      return false;
     return user.getPasswordHash().equals(hashPassword(password));
   }
 
@@ -72,7 +72,8 @@ public class SecurityModule {
 
   public boolean updateUser(User updatedUser) {
     User user = users.get(updatedUser.getUsername());
-    if (user == null) return false;
+    if (user == null)
+      return false;
     user.setName(updatedUser.getName());
     user.setLastName(updatedUser.getLastName());
     persistenceModule.saveUsers(userList);
@@ -88,7 +89,8 @@ public class SecurityModule {
   }
 
   public boolean registerUser(String id, String username, String password, String role, String name, String lastName) {
-    if (users.get(username) != null) return false;
+    if (users.get(username) != null)
+      return false;
     User newUser = new User(id, username, hashPassword(password), role, name, lastName);
     users.put(username, newUser);
     userList.add(newUser);
@@ -98,8 +100,10 @@ public class SecurityModule {
 
   public boolean changePassword(String username, String oldPassword, String newPassword) {
     User user = users.get(username);
-    if (user == null) return false;
-    if (!user.getPasswordHash().equals(hashPassword(oldPassword))) return false;
+    if (user == null)
+      return false;
+    if (!user.getPasswordHash().equals(hashPassword(oldPassword)))
+      return false;
     user.setPasswordHash(hashPassword(newPassword));
     persistenceModule.saveUsers(userList);
     return true;

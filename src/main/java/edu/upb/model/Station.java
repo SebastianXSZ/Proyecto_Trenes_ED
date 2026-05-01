@@ -29,8 +29,10 @@ public class Station implements Serializable {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null || getClass() != obj.getClass()) return false;
+    if (this == obj)
+      return true;
+    if (obj == null || getClass() != obj.getClass())
+      return false;
     Station station = (Station) obj;
     return id.equals(station.id);
   }

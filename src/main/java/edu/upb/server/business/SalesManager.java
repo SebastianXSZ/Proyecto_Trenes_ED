@@ -29,24 +29,21 @@ public class SalesManager {
 
   public SalesManager() {
     this.persistenceModule = new PersistenceModule();
-    this.fleet = persistenceModule.loadTrains();
     this.ticketCache = new HashTable<>(32);
     this.graph = new GraphMatrix<>(11);
     this.stations = new SinglyLinkedList<>();
-    this.routes = persistenceModule.loadRoutes();
-    this.employees = persistenceModule.loadEmployees();
+    this.routes = new SinglyLinkedList<>();
+    this.employees = new SinglyLinkedList<>();
+    this.fleet = new SinglyLinkedList<>();
+    initializeTestData();
     initializeStationsAndGraph();
-    if (this.fleet.isEmpty()) {
-      initializeTestData();
-      persistenceModule.saveTrains(this.fleet);
-    }
+    persistenceModule.saveTrains(this.fleet);
+    persistenceModule.saveRoutes(this.routes);
+    persistenceModule.saveEmployees(this.employees);
   }
 
   private void initializeStationsAndGraph() {
     this.stations = new SinglyLinkedList<>();
-    this.graph = new GraphMatrix<>(20); // Capacidad inicial aumentada
-
-    // Poblar estaciones y vértices desde las rutas
     Iterator<Route> routeIt = routes.iterator();
     while (routeIt.hasNext()) {
       Route route = routeIt.next();
@@ -58,13 +55,9 @@ public class SalesManager {
           stations.add(curr);
           graph.addVertex(curr);
         } else {
-          // Usar la instancia ya registrada en el grafo
           curr = findStationById(curr.getId());
         }
-
         if (prev != null) {
-          // Por simplicidad, si la ruta no define distancias por tramo,
-          // usamos una distancia proporcional a la distancia total o una fija
           double segmentDistance = route.getDistance() > 0 ? route.getDistance() : 50.0;
           graph.addEdge(prev, curr, segmentDistance);
         }

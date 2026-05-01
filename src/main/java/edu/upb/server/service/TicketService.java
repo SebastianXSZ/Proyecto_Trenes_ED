@@ -17,9 +17,12 @@ import edu.sebsx.app.linkedlist.singly.SinglyLinkedList;
 import edu.sebsx.model.list.List;
 
 /**
- * Implementación del objeto remoto RMI que expone los servicios del sistema de venta de boletos.
- * Actúa como fachada del servidor, delegando las operaciones de negocio al SalesManager,
- * SecurityModule y PersistenceModule. Los métodos aquí definidos pueden ser invocados
+ * Implementación del objeto remoto RMI que expone los servicios del sistema de
+ * venta de boletos.
+ * Actúa como fachada del servidor, delegando las operaciones de negocio al
+ * SalesManager,
+ * SecurityModule y PersistenceModule. Los métodos aquí definidos pueden ser
+ * invocados
  * remotamente desde el cliente a través de la interfaz TicketInterface.
  *
  * @author Sebastian Alberto Pinto Torres
@@ -54,7 +57,8 @@ public class TicketService extends UnicastRemoteObject implements TicketInterfac
   @Override
   public Ticket purchaseTicket(SaleDTO dto) throws RemoteException {
     Ticket ticket = salesManager.processTransaction(dto);
-    if (ticket != null) persistenceModule.saveTicket(ticket);
+    if (ticket != null)
+      persistenceModule.saveTicket(ticket);
     return ticket;
   }
 
@@ -79,7 +83,8 @@ public class TicketService extends UnicastRemoteObject implements TicketInterfac
   }
 
   @Override
-  public boolean registerUser(String id, String username, String password, String role, String name, String lastName) throws RemoteException {
+  public boolean registerUser(String id, String username, String password, String role, String name, String lastName)
+      throws RemoteException {
     return securityModule.registerUser(id, username, password, role, name, lastName);
   }
 
@@ -90,9 +95,9 @@ public class TicketService extends UnicastRemoteObject implements TicketInterfac
 
   @Override
   public String[] getStationNames() throws RemoteException {
-    return new String[] {"Altea Park", "Belmont Square", "Cambridge Hills", "Davenport Gate", 
-                         "East Hampton", "Fairmont Boulevard", "Grand Avenue", "Highbury Station", 
-                         "Ivy District", "Jade Gardens", "Kensington Way"};
+    return new String[] { "Altea Park", "Belmont Square", "Cambridge Hills", "Davenport Gate",
+        "East Hampton", "Fairmont Boulevard", "Grand Avenue", "Highbury Station",
+        "Ivy District", "Jade Gardens", "Kensington Way" };
   }
 
   @Override
@@ -118,7 +123,8 @@ public class TicketService extends UnicastRemoteObject implements TicketInterfac
   @Override
   public SinglyLinkedList<Passenger> getBoardingOrder(String trainId) throws RemoteException {
     Train train = salesManager.findTrainById(trainId);
-    if (train == null) return new SinglyLinkedList<>();
+    if (train == null)
+      return new SinglyLinkedList<>();
     BoardingMonitor monitor = new BoardingMonitor();
     return monitor.getBoardingOrder(train);
   }

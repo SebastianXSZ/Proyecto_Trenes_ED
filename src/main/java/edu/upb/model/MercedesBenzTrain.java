@@ -7,7 +7,7 @@ package edu.upb.model;
  * @version 1.0
  */
 public class MercedesBenzTrain extends Train {
-  
+
   private static final int MAX_WAGONS = 28;
 
   public MercedesBenzTrain(String id, String name, double loadCapacity, int mileage) {
