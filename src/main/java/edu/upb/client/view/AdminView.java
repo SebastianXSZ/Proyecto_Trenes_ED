@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import edu.upb.common.observer.Observer;
+import edu.sebsx.app.linkedlist.singly.SinglyLinkedList;
 
 /**
  * Ventana de administración para gestionar trenes y ver el orden de abordaje.
@@ -28,6 +29,8 @@ public class AdminView extends javax.swing.JFrame implements Observer {
     private Train selectedTrain = null;
     private transient List<Train> cachedTrains = null;
     private String filterQuery = "";
+    private int currentPage = 0;
+    private final int pageSize = 5;
 
     /**
      * Creates new form AdminView
@@ -63,6 +66,7 @@ public class AdminView extends javax.swing.JFrame implements Observer {
             String q = JOptionPane.showInputDialog(this, "ID o Nombre a buscar:", filterQuery);
             if (q != null) {
                 filterQuery = q;
+                currentPage = 0;
                 loadTrainsToTable();
             }
         });
@@ -104,38 +108,64 @@ public class AdminView extends javax.swing.JFrame implements Observer {
         this.onLogout = handler;
     }
 
+    /**
+     * Carga la lista de trenes en la tabla aplicando filtros y paginación.
+     */
     private void loadTrainsToTable() {
         try {
             cachedTrains = model.getAllTrains();
             DefaultTableModel tableModel = (DefaultTableModel) tblTrains.getModel();
             tableModel.setRowCount(0);
 
-            int count = 0;
+            // Filtrar
+            SinglyLinkedList<Train> filtered = new SinglyLinkedList<>();
             if (cachedTrains != null) {
                 Iterator<Train> it = cachedTrains.iterator();
                 while (it.hasNext()) {
                     Train t = it.next();
                     if (matchesFilter(t)) {
-                        String type = (t instanceof MercedesBenzTrain) ? "Mercedes-Benz" : "Arnold";
-                        tableModel.addRow(new Object[] {
-                                t.getId(), t.getName(), type,
-                                t.getLoadCapacity(), t.getMileage()
-                        });
-                        count++;
+                        filtered.add(t);
                     }
                 }
             }
 
-            String info = "Total: " + count;
+            // Paginación
+            int total = filtered.size();
+            int start = currentPage * pageSize;
+            int end = Math.min(start + pageSize, total);
+
+            Iterator<Train> it = filtered.iterator();
+            int index = 0;
+            while (it.hasNext() && index < end) {
+                Train t = it.next();
+                if (index >= start) {
+                    String type = (t instanceof edu.upb.model.MercedesBenzTrain) ? "Mercedes-Benz" : "Arnold";
+                    tableModel.addRow(new Object[] {
+                            t.getId(), t.getName(), type,
+                            t.getLoadCapacity(), t.getMileage()
+                    });
+                }
+                index++;
+            }
+
+            String info = "Página " + (currentPage + 1) + " (Total: " + total + ")";
             if (filterQuery != null && !filterQuery.isEmpty()) {
                 info += " (Filtrado)";
             }
             lblMessage.setText(info);
+            btnPrev.setEnabled(currentPage > 0);
+            btnNext.setEnabled(end < total);
+
         } catch (Exception e) {
             lblMessage.setText("Error al cargar datos.");
         }
     }
 
+    /**
+     * Actualiza la vista ante cambios en el modelo (Observer).
+     * 
+     * @param event El nombre del evento de actualización.
+     */
     @Override
     public void update(String event) {
         if (event.startsWith("TRAIN_") || event.equals("ROUTE_DELETED")) {
@@ -188,7 +218,8 @@ public class AdminView extends javax.swing.JFrame implements Observer {
      */
 
     // <editor-fold defaultstate="collapsed" desc="Generated
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
@@ -211,8 +242,11 @@ public class AdminView extends javax.swing.JFrame implements Observer {
         btnBoarding = new javax.swing.JButton();
         btnLogout = new javax.swing.JButton();
         btnRoutes = new javax.swing.JButton();
+        btnEmployees = new javax.swing.JButton();
+        btnPrev = new javax.swing.JButton("< Anterior");
+        btnNext = new javax.swing.JButton("Siguiente >");
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Administración de trenes - UPB");
 
         jLabel1.setText("ID:");
@@ -265,16 +299,15 @@ public class AdminView extends javax.swing.JFrame implements Observer {
         jScrollPane2.setName("scrollPane"); // NOI18N
 
         tblTrains.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
-            },
-            new String [] {
-                "ID", "Nombre", "Tipo", "Capacidad", "Kilometraje"
-            }
-        ));
+                new Object[][] {
+                        { null, null, null, null, null },
+                        { null, null, null, null, null },
+                        { null, null, null, null, null },
+                        { null, null, null, null, null }
+                },
+                new String[] {
+                        "ID", "Nombre", "Tipo", "Capacidad", "Kilometraje"
+                }));
         tblTrains.setName("tblTrains"); // NOI18N
         jScrollPane2.setViewportView(tblTrains);
 
@@ -289,100 +322,184 @@ public class AdminView extends javax.swing.JFrame implements Observer {
         btnRoutes.setText("Gestión de rutas");
         btnRoutes.addActionListener(this::btnRoutesActionPerformed);
 
+        btnEmployees.setText("Gestión de empleados");
+        btnEmployees.addActionListener(this::btnEmployeesActionPerformed);
+
+        btnPrev.addActionListener(e -> {
+            if (currentPage > 0) {
+                currentPage--;
+                loadTrainsToTable();
+            }
+        });
+        btnNext.addActionListener(e -> {
+            currentPage++;
+            loadTrainsToTable();
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(23, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel4))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txtMileage, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtCapacity, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(cmbType, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(45, 45, 45)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnRefresh)
-                            .addComponent(btnDelete)
-                            .addComponent(btnUpdate)
-                            .addComponent(btnAdd))
-                        .addGap(12, 12, 12))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblMessage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnBoarding))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(btnRoutes)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnLogout)))
-                .addGap(20, 20, 20))
-        );
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addContainerGap(23, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0,
+                                                Short.MAX_VALUE)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING,
+                                                                false)
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addGroup(layout.createParallelGroup(
+                                                                        javax.swing.GroupLayout.Alignment.LEADING)
+                                                                        .addComponent(jLabel3,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                125,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                        .addComponent(jLabel4))
+                                                                .addPreferredGap(
+                                                                        javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addGroup(layout.createParallelGroup(
+                                                                        javax.swing.GroupLayout.Alignment.LEADING)
+                                                                        .addComponent(txtMileage,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                71,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                        .addComponent(txtCapacity,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                71,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(jLabel5,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE, 37,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addPreferredGap(
+                                                                        javax.swing.LayoutStyle.ComponentPlacement.RELATED,
+                                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                        Short.MAX_VALUE)
+                                                                .addComponent(cmbType,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE, 116,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addGroup(layout.createParallelGroup(
+                                                                        javax.swing.GroupLayout.Alignment.LEADING)
+                                                                        .addComponent(jLabel1,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                37,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                        .addComponent(jLabel2,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                57,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                                .addGap(45, 45, 45)
+                                                                .addGroup(layout.createParallelGroup(
+                                                                        javax.swing.GroupLayout.Alignment.LEADING)
+                                                                        .addComponent(txtName,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                100,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                        .addComponent(txtId,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                100,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40,
+                                                        Short.MAX_VALUE)
+                                                .addGroup(layout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(btnRefresh)
+                                                        .addComponent(btnDelete)
+                                                        .addComponent(btnUpdate)
+                                                        .addComponent(btnAdd))
+                                                .addGap(12, 12, 12))
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(btnPrev)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(lblMessage, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(btnNext))
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(btnBoarding)
+                                                .addGap(0, 0, Short.MAX_VALUE))
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout
+                                                .createSequentialGroup()
+                                                .addComponent(btnEmployees)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED,
+                                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addComponent(btnRoutes)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(btnLogout)))
+                                .addGap(20, 20, 20)));
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(26, 26, 26)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnAdd)
-                        .addGap(21, 21, 21)
-                        .addComponent(btnUpdate)
-                        .addGap(21, 21, 21)
-                        .addComponent(btnDelete)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnRefresh))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel1))
-                        .addGap(12, 12, 12)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel2)
-                            .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel3)
-                            .addComponent(txtCapacity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel4)
-                            .addComponent(txtMileage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(6, 6, 6)
-                                .addComponent(jLabel5))
-                            .addComponent(cmbType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 53, Short.MAX_VALUE)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(lblMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnBoarding))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnLogout)
-                    .addComponent(btnRoutes))
-                .addGap(0, 5, Short.MAX_VALUE))
-        );
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(26, 26, 26)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(btnAdd)
+                                                .addGap(21, 21, 21)
+                                                .addComponent(btnUpdate)
+                                                .addGap(21, 21, 21)
+                                                .addComponent(btnDelete)
+                                                .addGap(18, 18, 18)
+                                                .addComponent(btnRefresh))
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(jLabel1))
+                                                .addGap(12, 12, 12)
+                                                .addGroup(layout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(jLabel2)
+                                                        .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addGroup(layout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(jLabel3)
+                                                        .addComponent(txtCapacity,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addGroup(layout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(jLabel4)
+                                                        .addComponent(txtMileage,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addGroup(layout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addGap(6, 6, 6)
+                                                                .addComponent(jLabel5))
+                                                        .addComponent(cmbType, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 53,
+                                        Short.MAX_VALUE)
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 181,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(btnPrev)
+                                        .addComponent(lblMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 23,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(btnNext))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(btnBoarding)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(btnLogout)
+                                        .addComponent(btnRoutes)
+                                        .addComponent(btnEmployees))
+                                .addGap(0, 5, Short.MAX_VALUE)));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -405,12 +522,20 @@ public class AdminView extends javax.swing.JFrame implements Observer {
         } else {
             train = new ArnoldTrain(id, name, capacity, mileage);
         }
+
+        // Agregar vagones por defecto (RF-17: 1 carga por cada 2 pasajeros)
+        edu.upb.model.PassengerWagon pw1 = new edu.upb.model.PassengerWagon(id + "-W1");
+        edu.upb.model.PassengerWagon pw2 = new edu.upb.model.PassengerWagon(id + "-W2");
+        edu.upb.model.CargoWagon cw1 = new edu.upb.model.CargoWagon(id + "-C1");
+        train.addWagon(pw1);
+        train.addWagon(pw2);
+        train.addWagon(cw1);
         try {
-            boolean success = model.addTrain(train);
-            if (success) {
-                filterQuery = "";
-                clearForm();
+            if (model.addTrain(train)) {
                 lblMessage.setText("Tren agregado.");
+                currentPage = 0;
+                loadTrainsToTable();
+                clearForm();
             } else {
                 lblMessage.setText("Error al agregar el tren.");
             }
@@ -432,11 +557,11 @@ public class AdminView extends javax.swing.JFrame implements Observer {
         selectedTrain.setMileage(Integer.parseInt(txtMileage.getText().trim()));
 
         try {
-            boolean success = model.updateTrain(selectedTrain);
-            if (success) {
-                filterQuery = "";
-                clearForm();
+            if (model.updateTrain(selectedTrain)) {
                 lblMessage.setText("Tren actualizado.");
+                currentPage = 0;
+                loadTrainsToTable();
+                clearForm();
             } else {
                 lblMessage.setText("Error al actualizar.");
             }
@@ -459,11 +584,11 @@ public class AdminView extends javax.swing.JFrame implements Observer {
             return;
 
         try {
-            boolean success = model.deleteTrain(selectedTrain.getId());
-            if (success) {
-                filterQuery = "";
-                clearForm();
+            if (model.deleteTrain(selectedTrain.getId())) {
                 lblMessage.setText("Tren eliminado.");
+                currentPage = 0;
+                loadTrainsToTable();
+                clearForm();
             } else {
                 lblMessage.setText("Error al eliminar.");
             }
@@ -474,6 +599,7 @@ public class AdminView extends javax.swing.JFrame implements Observer {
 
     private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnRefreshActionPerformed
         filterQuery = "";
+        currentPage = 0;
         cachedTrains = null;
         loadTrainsToTable();
         clearForm();
@@ -502,11 +628,19 @@ public class AdminView extends javax.swing.JFrame implements Observer {
         view.setVisible(true);
     }// GEN-LAST:event_btnRoutesActionPerformed
 
+    private void btnEmployeesActionPerformed(java.awt.event.ActionEvent evt) {
+        EmployeeView view = new EmployeeView(model);
+        view.setVisible(true);
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnBoarding;
     private javax.swing.JButton btnDelete;
+    private javax.swing.JButton btnEmployees;
     private javax.swing.JButton btnLogout;
+    private javax.swing.JButton btnNext;
+    private javax.swing.JButton btnPrev;
     private javax.swing.JButton btnRefresh;
     private javax.swing.JButton btnRoutes;
     private javax.swing.JButton btnUpdate;

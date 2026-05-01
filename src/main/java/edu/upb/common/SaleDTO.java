@@ -18,17 +18,33 @@ public class SaleDTO implements Serializable {
   private String origin;
   private String destination;
   private String passengerName;
+  private String passengerLastName;
+  private String passengerId;
+  private String idType;
+  private String address;
+  private String phoneNumbers;
+  private String contactPersonName;
+  private String contactPersonLastName;
+  private String contactPersonPhone;
   private String category;
   private String userId;
   private double baggageWeight;
   
   public SaleDTO() {}
   
-  public SaleDTO(String trainId, String origin, String destination, String passengerName, String category, String userId, double baggageWeight) {
+  public SaleDTO(String trainId, String origin, String destination, String passengerName, String passengerLastName, String passengerId, String idType, String address, String phoneNumbers, String contactPersonName, String contactPersonLastName, String contactPersonPhone, String category, String userId, double baggageWeight) {
     this.trainId = trainId;
     this.origin = origin;
     this.destination = destination;
     this.passengerName = passengerName;
+    this.passengerLastName = passengerLastName;
+    this.passengerId = passengerId;
+    this.idType = idType;
+    this.address = address;
+    this.phoneNumbers = phoneNumbers;
+    this.contactPersonName = contactPersonName;
+    this.contactPersonLastName = contactPersonLastName;
+    this.contactPersonPhone = contactPersonPhone;
     this.category = category;
     this.userId = userId;
     this.baggageWeight = baggageWeight;
@@ -64,6 +80,70 @@ public class SaleDTO implements Serializable {
   
   public void setPassengerName(String passengerName) {
     this.passengerName = passengerName;
+  }
+
+  public String getPassengerLastName() {
+    return passengerLastName;
+  }
+
+  public void setPassengerLastName(String passengerLastName) {
+    this.passengerLastName = passengerLastName;
+  }
+
+  public String getPassengerId() {
+    return passengerId;
+  }
+
+  public void setPassengerId(String passengerId) {
+    this.passengerId = passengerId;
+  }
+
+  public String getIdType() {
+    return idType;
+  }
+
+  public void setIdType(String idType) {
+    this.idType = idType;
+  }
+
+  public String getAddress() {
+    return address;
+  }
+
+  public void setAddress(String address) {
+    this.address = address;
+  }
+
+  public String getPhoneNumbers() {
+    return phoneNumbers;
+  }
+
+  public void setPhoneNumbers(String phoneNumbers) {
+    this.phoneNumbers = phoneNumbers;
+  }
+
+  public String getContactPersonName() {
+    return contactPersonName;
+  }
+
+  public void setContactPersonName(String contactPersonName) {
+    this.contactPersonName = contactPersonName;
+  }
+
+  public String getContactPersonLastName() {
+    return contactPersonLastName;
+  }
+
+  public void setContactPersonLastName(String contactPersonLastName) {
+    this.contactPersonLastName = contactPersonLastName;
+  }
+
+  public String getContactPersonPhone() {
+    return contactPersonPhone;
+  }
+
+  public void setContactPersonPhone(String contactPersonPhone) {
+    this.contactPersonPhone = contactPersonPhone;
   }
   
   public String getCategory() {

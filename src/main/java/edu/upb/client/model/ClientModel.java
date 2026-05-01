@@ -131,9 +131,31 @@ public class ClientModel extends Subject {
     }
   }
 
-  public boolean registerUser(String id, String username, String password, String role) {
+  public edu.upb.model.User getUser(String username) {
     try {
-      return ticketService.registerUser(id, username, password, role);
+      return ticketService.getUser(username);
+    } catch (Exception e) {
+      logger = "Error fetching user: " + e.getMessage();
+      notifyObservers("ERROR");
+      return null;
+    }
+  }
+
+  public boolean updateUser(edu.upb.model.User user) {
+    try {
+      boolean success = ticketService.updateUser(user);
+      if (success) notifyObservers("USER_UPDATED");
+      return success;
+    } catch (Exception e) {
+      logger = "Error updating user: " + e.getMessage();
+      notifyObservers("ERROR");
+      return false;
+    }
+  }
+
+  public boolean registerUser(String id, String username, String password, String role, String name, String lastName) {
+    try {
+      return ticketService.registerUser(id, username, password, role, name, lastName);
     } catch (Exception e) {
       logger = "Error registering user: " + e.getMessage();
       notifyObservers("ERROR");
@@ -200,6 +222,46 @@ public class ClientModel extends Subject {
       return success;
     } catch (Exception e) {
       logger = "Error deleting route: " + e.getMessage();
+      notifyObservers("ERROR");
+      return false;
+    }
+  }
+
+  public List<edu.upb.model.Employee> getAllEmployees() throws Exception {
+    return ticketService.getAllEmployees();
+  }
+
+  public boolean addEmployee(edu.upb.model.Employee employee) {
+    try {
+      boolean success = ticketService.addEmployee(employee);
+      if (success) notifyObservers("EMPLOYEE_ADDED");
+      return success;
+    } catch (Exception e) {
+      logger = "Error adding employee: " + e.getMessage();
+      notifyObservers("ERROR");
+      return false;
+    }
+  }
+
+  public boolean updateEmployee(edu.upb.model.Employee employee) {
+    try {
+      boolean success = ticketService.updateEmployee(employee);
+      if (success) notifyObservers("EMPLOYEE_UPDATED");
+      return success;
+    } catch (Exception e) {
+      logger = "Error updating employee: " + e.getMessage();
+      notifyObservers("ERROR");
+      return false;
+    }
+  }
+
+  public boolean deleteEmployee(String employeeId) {
+    try {
+      boolean success = ticketService.deleteEmployee(employeeId);
+      if (success) notifyObservers("EMPLOYEE_DELETED");
+      return success;
+    } catch (Exception e) {
+      logger = "Error deleting employee: " + e.getMessage();
       notifyObservers("ERROR");
       return false;
     }

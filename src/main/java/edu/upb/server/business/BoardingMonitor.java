@@ -6,15 +6,17 @@ import edu.upb.model.Wagon;
 import edu.upb.model.PassengerWagon;
 import edu.sebsx.app.array.Array;
 import edu.sebsx.app.linkedlist.singly.SinglyLinkedList;
-import edu.sebsx.app.queue.priorityqueue.PriorityQueue;
 import edu.sebsx.app.stack.list.Stack;
 import edu.sebsx.model.iterator.Iterator;
 
 /**
- * Control de abordaje de pasajeros para la publicación en monitores de estación.
- * Implementa el orden de embarque exigido por RF-18: los pasajeros abordan de atrás hacia adelante,
+ * Control de abordaje de pasajeros para la publicación en monitores de
+ * estación.
+ * Implementa el orden de embarque exigido por RF-18: los pasajeros abordan de
+ * atrás hacia adelante,
  * respetando el privilegio de tarifa (Premium > Ejecutivo > Estándar).
- * Utiliza un TAD PriorityQueue para ordenar por categoría y un TAD Stack para invertir
+ * Utiliza un TAD PriorityQueue para ordenar por categoría y un TAD Stack para
+ * invertir
  * el orden y simular el abordaje desde los vagones traseros.
  *
  * @author Sebastian Alberto Pinto Torres
@@ -23,37 +25,42 @@ import edu.sebsx.model.iterator.Iterator;
 public class BoardingMonitor {
 
   public SinglyLinkedList<Passenger> getBoardingOrder(Train train) {
-    PriorityQueue<Passenger> priorityQueue = new PriorityQueue<>(3);
+    SinglyLinkedList<Passenger> boardingOrder = new SinglyLinkedList<>();
     SinglyLinkedList<Wagon> wagons = train.getWagons();
+
+    // Convertir a algo que permita recorrer en orden inverso (Pila para invertir
+    // vagones)
+    Stack<Wagon> wagonStack = new Stack<>();
     Iterator<Wagon> wagonIt = wagons.iterator();
     while (wagonIt.hasNext()) {
-      Wagon w = wagonIt.next();
-      if (w instanceof PassengerWagon) {
-        PassengerWagon pw = (PassengerWagon) w;
-        Array<Passenger> passengers = pw.getPassengers();
-        for (int i = 0; i < passengers.size(); i++) {
-          Passenger p = passengers.get(i);
-          if (p != null) {
-            String category = pw.getPassengerCategory(p);
-            int priority = getPriority(category);
-            priorityQueue.insert(priority, p);
-          }
-        }
+      wagonStack.push(wagonIt.next());
+    }
+
+    // Recorrer vagones desde el último hasta el primero
+    while (!wagonStack.isEmpty()) {
+      Wagon w = wagonStack.pop();
+      if (w instanceof PassengerWagon pw) {
+        // Procesar categorías en orden: primero Premium, luego Ejecutivo, luego
+        // Estándar
+        addPassengersByCategory(pw, "Premium", boardingOrder);
+        addPassengersByCategory(pw, "Ejecutivo", boardingOrder);
+        addPassengersByCategory(pw, "Estándar", boardingOrder);
       }
     }
-    Stack<Passenger> stack = new Stack<>();
-    while (!priorityQueue.isEmpty()) stack.push(priorityQueue.extract());
-    SinglyLinkedList<Passenger> boardingOrder = new SinglyLinkedList<>();
-    while (!stack.isEmpty()) boardingOrder.add(stack.pop());
     return boardingOrder;
   }
-  
-  private int getPriority(String category) {
-    if (category == null) return 2;
-    switch (category) {
-      case "Premium": return 0;
-      case "Ejecutivo": return 1;
-      default: return 2;
+
+  private void addPassengersByCategory(PassengerWagon pw, String category, SinglyLinkedList<Passenger> list) {
+    Array<Passenger> passengers = pw.getPassengers();
+    // Nota: getPassengers devuelve una copia con solo los no nulos
+    // Pero necesitamos filtrar por categoría. PassengerWagon debería tener un
+    // método para esto o
+    // podemos usar getPassengerCategory si lo hace público (lo es).
+    for (int i = 0; i < passengers.size(); i++) {
+      Passenger p = passengers.get(i);
+      if (p != null && category.equalsIgnoreCase(pw.getPassengerCategory(p))) {
+        list.add(p);
+      }
     }
   }
 }

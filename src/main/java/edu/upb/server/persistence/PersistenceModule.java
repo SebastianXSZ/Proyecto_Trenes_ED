@@ -105,4 +105,27 @@ public class PersistenceModule {
       return new SinglyLinkedList<>();
     }
   }
+
+  private static final String EMPLOYEES_FILE = "employees.dat";
+
+  public boolean saveEmployees(SinglyLinkedList<edu.upb.model.Employee> employees) {
+    try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(EMPLOYEES_FILE))) {
+      oos.writeObject(employees);
+      return true;
+    } catch (IOException e) {
+      e.printStackTrace();
+      return false;
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public SinglyLinkedList<edu.upb.model.Employee> loadEmployees() {
+    File file = new File(EMPLOYEES_FILE);
+    if (!file.exists()) return new SinglyLinkedList<>();
+    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+      return (SinglyLinkedList<edu.upb.model.Employee>) ois.readObject();
+    } catch (Exception e) {
+      return new SinglyLinkedList<>();
+    }
+  }
 }

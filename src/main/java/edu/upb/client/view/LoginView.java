@@ -42,6 +42,8 @@ public class LoginView extends javax.swing.JFrame {
     
     private void registerUserFlow() {
         javax.swing.JTextField txtId = new javax.swing.JTextField();
+        javax.swing.JTextField txtName = new javax.swing.JTextField();
+        javax.swing.JTextField txtLastName = new javax.swing.JTextField();
         javax.swing.JTextField txtUser = new javax.swing.JTextField();
         javax.swing.JPasswordField txtPass = new javax.swing.JPasswordField();
         javax.swing.JComboBox<String> cmbRole = new javax.swing.JComboBox<>(new String[]{"ADMIN", "OPERATOR", "STANDARD_USER"});
@@ -49,6 +51,10 @@ public class LoginView extends javax.swing.JFrame {
         javax.swing.JPanel panel = new javax.swing.JPanel(new java.awt.GridLayout(0, 1));
         panel.add(new javax.swing.JLabel("ID:"));
         panel.add(txtId);
+        panel.add(new javax.swing.JLabel("Nombre:"));
+        panel.add(txtName);
+        panel.add(new javax.swing.JLabel("Apellido:"));
+        panel.add(txtLastName);
         panel.add(new javax.swing.JLabel("Usuario:"));
         panel.add(txtUser);
         panel.add(new javax.swing.JLabel("Contraseña:"));
@@ -59,15 +65,17 @@ public class LoginView extends javax.swing.JFrame {
         int result = javax.swing.JOptionPane.showConfirmDialog(this, panel, "Registrar Usuario", javax.swing.JOptionPane.OK_CANCEL_OPTION, javax.swing.JOptionPane.PLAIN_MESSAGE);
         if (result == javax.swing.JOptionPane.OK_OPTION) {
             String id = txtId.getText().trim();
+            String name = txtName.getText().trim();
+            String lastName = txtLastName.getText().trim();
             String user = txtUser.getText().trim();
             String pass = new String(txtPass.getPassword());
             String role = (String) cmbRole.getSelectedItem();
-            if (id.isEmpty() || user.isEmpty() || pass.isEmpty()) {
+            if (id.isEmpty() || user.isEmpty() || pass.isEmpty() || name.isEmpty() || lastName.isEmpty()) {
                 javax.swing.JOptionPane.showMessageDialog(this, "Todos los campos son obligatorios.");
                 return;
             }
             if (registerHandler != null) {
-                registerHandler.accept(new Object[]{id, user, pass, role}, success -> {
+                registerHandler.accept(new Object[]{id, user, pass, role, name, lastName}, success -> {
                     if (success) {
                         javax.swing.JOptionPane.showMessageDialog(this, "Usuario registrado exitosamente.");
                     } else {

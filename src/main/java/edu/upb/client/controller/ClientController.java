@@ -37,7 +37,7 @@ public class ClientController {
         callback.accept(valid);
       },
       (data, callback) -> {
-        boolean success = model.registerUser((String)data[0], (String)data[1], (String)data[2], (String)data[3]);
+        boolean success = model.registerUser((String)data[0], (String)data[1], (String)data[2], (String)data[3], (String)data[4], (String)data[5]);
         callback.accept(success);
       }
     );
@@ -60,7 +60,7 @@ public class ClientController {
     adminView.addWindowListener(new java.awt.event.WindowAdapter() {
         @Override
         public void windowClosing(java.awt.event.WindowEvent e) {
-            model.detach(adminView);
+            logout();
         }
     });
     adminView.setVisible(true);
@@ -71,13 +71,49 @@ public class ClientController {
     purchaseView.setStationNames(model.getStationNames());
     purchaseView.setPurchaseHandler(this::handlePurchase);
     addProfileMenu(purchaseView, username);
+    purchaseView.addWindowListener(new java.awt.event.WindowAdapter() {
+        @Override
+        public void windowClosing(java.awt.event.WindowEvent e) {
+            logout();
+        }
+    });
     purchaseView.setVisible(true);
   }
 
   private void addProfileMenu(javax.swing.JFrame frame, String username) {
     javax.swing.JMenuBar menuBar = frame.getJMenuBar();
     if (menuBar == null) menuBar = new javax.swing.JMenuBar();
-    javax.swing.JMenu menu = new javax.swing.JMenu("Perfil (" + username + ")");
+    
+    edu.upb.model.User currentUser = model.getUser(username);
+    String role = currentUser != null ? currentUser.getRole() : "UNKNOWN";
+    
+    javax.swing.JMenu menu = new javax.swing.JMenu("Perfil (" + username + " - " + role + ")");
+    
+    javax.swing.JMenuItem itemEditProfile = new javax.swing.JMenuItem("Editar Perfil");
+    itemEditProfile.addActionListener(e -> {
+      edu.upb.model.User user = model.getUser(username);
+      if (user == null) return;
+      
+      javax.swing.JTextField txtName = new javax.swing.JTextField(user.getName());
+      javax.swing.JTextField txtLastName = new javax.swing.JTextField(user.getLastName());
+      javax.swing.JPanel panel = new javax.swing.JPanel(new java.awt.GridLayout(0, 1));
+      panel.add(new javax.swing.JLabel("Nombre:"));
+      panel.add(txtName);
+      panel.add(new javax.swing.JLabel("Apellido:"));
+      panel.add(txtLastName);
+      
+      int res = javax.swing.JOptionPane.showConfirmDialog(frame, panel, "Editar Perfil", javax.swing.JOptionPane.OK_CANCEL_OPTION, javax.swing.JOptionPane.PLAIN_MESSAGE);
+      if (res == javax.swing.JOptionPane.OK_OPTION) {
+        user.setName(txtName.getText().trim());
+        user.setLastName(txtLastName.getText().trim());
+        if (model.updateUser(user)) {
+          javax.swing.JOptionPane.showMessageDialog(frame, "Perfil actualizado.");
+        } else {
+          javax.swing.JOptionPane.showMessageDialog(frame, "Error al actualizar perfil.");
+        }
+      }
+    });
+    
     javax.swing.JMenuItem itemChangePass = new javax.swing.JMenuItem("Cambiar Contraseña");
     itemChangePass.addActionListener(e -> {
       javax.swing.JPasswordField txtOld = new javax.swing.JPasswordField();
@@ -97,6 +133,7 @@ public class ClientController {
         }
       }
     });
+    menu.add(itemEditProfile);
     menu.add(itemChangePass);
     menuBar.add(menu);
     frame.setJMenuBar(menuBar);

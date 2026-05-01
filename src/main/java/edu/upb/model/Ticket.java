@@ -26,7 +26,16 @@ public class Ticket implements Serializable {
   private String seatNumber;
   private String category;
   private double fareValue;
+  private String passengerId;
+  private String idType;
+  private String address;
+  private String phoneNumbers;
+  private String contactPersonName;
+  private String contactPersonLastName;
+  private String contactPersonPhone;
   private String baggageId;
+  private double baggageWeight;
+  private String cargoWagonId;
   private String wagonId;
 
   public Ticket() {
@@ -78,6 +87,62 @@ public class Ticket implements Serializable {
     this.passengerLastName = passengerLastName;
   }
 
+  public String getPassengerId() {
+    return passengerId;
+  }
+
+  public void setPassengerId(String passengerId) {
+    this.passengerId = passengerId;
+  }
+
+  public String getIdType() {
+    return idType;
+  }
+
+  public void setIdType(String idType) {
+    this.idType = idType;
+  }
+
+  public String getAddress() {
+    return address;
+  }
+
+  public void setAddress(String address) {
+    this.address = address;
+  }
+
+  public String getPhoneNumbers() {
+    return phoneNumbers;
+  }
+
+  public void setPhoneNumbers(String phoneNumbers) {
+    this.phoneNumbers = phoneNumbers;
+  }
+
+  public String getContactPersonName() {
+    return contactPersonName;
+  }
+
+  public void setContactPersonName(String contactPersonName) {
+    this.contactPersonName = contactPersonName;
+  }
+
+  public String getContactPersonLastName() {
+    return contactPersonLastName;
+  }
+
+  public void setContactPersonLastName(String contactPersonLastName) {
+    this.contactPersonLastName = contactPersonLastName;
+  }
+
+  public String getContactPersonPhone() {
+    return contactPersonPhone;
+  }
+
+  public void setContactPersonPhone(String contactPersonPhone) {
+    this.contactPersonPhone = contactPersonPhone;
+  }
+
   public String getTrainId() {
     return trainId;
   }
@@ -118,6 +183,22 @@ public class Ticket implements Serializable {
     this.baggageId = baggageId;
   }
 
+  public double getBaggageWeight() {
+    return baggageWeight;
+  }
+
+  public void setBaggageWeight(double baggageWeight) {
+    this.baggageWeight = baggageWeight;
+  }
+
+  public String getCargoWagonId() {
+    return cargoWagonId;
+  }
+
+  public void setCargoWagonId(String cargoWagonId) {
+    this.cargoWagonId = cargoWagonId;
+  }
+
   public String getWagonId() {
     return wagonId;
   }
@@ -133,4 +214,4 @@ public class Ticket implements Serializable {
   public String getId() {
     return getRegistrationId();
   }
-}
+}

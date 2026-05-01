@@ -15,12 +15,16 @@ public class User implements Serializable {
   private String username;
   private String passwordHash;
   private String role;
+  private String name;
+  private String lastName;
 
-  public User(String id, String username, String passwordHash, String role) {
+  public User(String id, String username, String passwordHash, String role, String name, String lastName) {
     this.id = id;
     this.username = username;
     this.passwordHash = passwordHash;
     this.role = role;
+    this.name = name;
+    this.lastName = lastName;
   }
 
   public String getId() {
@@ -37,6 +41,22 @@ public class User implements Serializable {
 
   public String getRole() {
     return role;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getLastName() {
+    return lastName;
+  }
+
+  public void setLastName(String lastName) {
+    this.lastName = lastName;
   }
 
   public void setPasswordHash(String passwordHash) {

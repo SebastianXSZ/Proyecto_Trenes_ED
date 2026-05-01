@@ -24,6 +24,7 @@ public class SalesManager {
   private GraphMatrix<Station, Double> graph;
   private SinglyLinkedList<Station> stations;
   private SinglyLinkedList<Route> routes;
+  private SinglyLinkedList<Employee> employees;
   private PersistenceModule persistenceModule;
 
   public SalesManager() {
@@ -33,58 +34,51 @@ public class SalesManager {
     this.graph = new GraphMatrix<>(11);
     this.stations = new SinglyLinkedList<>();
     this.routes = persistenceModule.loadRoutes();
+    this.employees = persistenceModule.loadEmployees();
     initializeStationsAndGraph();
     if (this.fleet.isEmpty()) {
-        initializeTestData();
-        persistenceModule.saveTrains(this.fleet);
+      initializeTestData();
+      persistenceModule.saveTrains(this.fleet);
     }
   }
 
   private void initializeStationsAndGraph() {
-    String[] names = {"Altea Park", "Belmont Square", "Cambridge Hills", "Davenport Gate", 
-                      "East Hampton", "Fairmont Boulevard", "Grand Avenue", "Highbury Station", 
-                      "Ivy District", "Jade Gardens", "Kensington Way"};
-    for (String name : names) {
-      Station station = new Station(name, name);
-      stations.add(station);
-      graph.addVertex(station);
-    }
-    double[][] distances = {
-      {0, 30, 40, 50, -1, 50, -1, -1, -1, -1, -1},
-      {30, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-      {40, -1, 0, -1, -1, -1, -1, -1, 80, 120, 110},
-      {50, -1, -1, 0, 20, -1, -1, -1, -1, -1, -1},
-      {-1, -1, -1, 20, 0, 65, -1, -1, -1, -1, -1},
-      {50, -1, -1, -1, 65, 0, 80, -1, -1, -1, -1},
-      {-1, -1, -1, -1, -1, 80, 0, 30, 145, -1, -1},
-      {-1, -1, -1, -1, -1, -1, 30, 0, -1, -1, -1},
-      {-1, -1, 80, -1, -1, -1, 145, -1, 0, -1, -1},
-      {-1, -1, 120, -1, -1, -1, -1, -1, -1, 0, -1},
-      {-1, -1, 110, -1, -1, -1, -1, -1, -1, -1, 0}
-    };
-    for (int i = 0; i < 11; i++) {
-      for (int j = 0; j < 11; j++) {
-        if (distances[i][j] > 0) graph.addEdge(getStation(i), getStation(j), distances[i][j]);
+    this.stations = new SinglyLinkedList<>();
+    this.graph = new GraphMatrix<>(20); // Capacidad inicial aumentada
+
+    // Poblar estaciones y vértices desde las rutas
+    Iterator<Route> routeIt = routes.iterator();
+    while (routeIt.hasNext()) {
+      Route route = routeIt.next();
+      Iterator<Station> stationIt = route.getStations().iterator();
+      Station prev = null;
+      while (stationIt.hasNext()) {
+        Station curr = stationIt.next();
+        if (findStationById(curr.getId()) == null) {
+          stations.add(curr);
+          graph.addVertex(curr);
+        } else {
+          // Usar la instancia ya registrada en el grafo
+          curr = findStationById(curr.getId());
+        }
+
+        if (prev != null) {
+          // Por simplicidad, si la ruta no define distancias por tramo,
+          // usamos una distancia proporcional a la distancia total o una fija
+          double segmentDistance = route.getDistance() > 0 ? route.getDistance() : 50.0;
+          graph.addEdge(prev, curr, segmentDistance);
+        }
+        prev = curr;
       }
     }
-  }
-
-  private Station getStation(int index) {
-    Iterator<Station> it = stations.iterator();
-    int i = 0;
-    while (it.hasNext()) {
-      Station station = it.next();
-      if (i == index) return station;
-      i++;
-    }
-    return null;
   }
 
   private Station findStationById(String id) {
     Iterator<Station> it = stations.iterator();
     while (it.hasNext()) {
       Station station = it.next();
-      if (station.getId().equals(id)) return station;
+      if (station.getId().equals(id))
+        return station;
     }
     return null;
   }
@@ -101,48 +95,147 @@ public class SalesManager {
   }
 
   public Ticket processTransaction(SaleDTO dto) {
-    if (fleet.isEmpty()) return null;
-    Train selectedTrain = fleet.iterator().next();
-    String seat = assignSeat(selectedTrain, dto.getCategory());
-    if (seat == null) return null;
+    if (fleet.isEmpty())
+      return null;
+    // Validar equipaje (RF-17: límite 80kg por maleta)
+    if (dto.getBaggageWeight() > 80) {
+      return null;
+    }
+
+    Train selectedTrain = findTrainById(dto.getTrainId());
+    if (selectedTrain == null)
+      selectedTrain = fleet.iterator().next(); // Fallback
+
+    // Crear pasajero
+    String passengerId = dto.getPassengerId() != null ? dto.getPassengerId() : "P-" + System.currentTimeMillis();
+    Passenger passenger = new Passenger(passengerId, dto.getPassengerName(), 0);
+
+    // Asignar asiento y agregar al vagón
+    String seatInfo = assignSeatAndAddPassenger(selectedTrain, dto.getCategory(), passenger);
+    if (seatInfo == null)
+      return null;
+
+    // Manejar equipaje
+    String cargoWagonId = "N/A";
+    String baggageId = "N/A";
+    if (dto.getBaggageWeight() > 0) {
+      Baggage baggage = new Baggage("B-" + System.currentTimeMillis(), dto.getBaggageWeight(), passengerId);
+      CargoWagon cw = findAvailableCargoWagon(selectedTrain);
+      if (cw != null) {
+        cw.addBaggage(baggage);
+        cargoWagonId = cw.getId();
+        baggageId = baggage.getId();
+      }
+    }
+
     double fare = calculateFare(dto.getOrigin(), dto.getDestination());
-    if (fare < 0) return null;
+    if (fare < 0)
+      fare = 50000.0;
+
+    // Aplicar multiplicadores de categoría
+    if ("Premium".equalsIgnoreCase(dto.getCategory()))
+      fare *= 2.0;
+    else if ("Ejecutivo".equalsIgnoreCase(dto.getCategory()))
+      fare *= 1.5;
+
     Ticket ticket = new Ticket();
     ticket.setTrainId(selectedTrain.getId());
     ticket.setPassengerName(dto.getPassengerName());
+    ticket.setPassengerLastName(dto.getPassengerLastName());
+    ticket.setPassengerId(passengerId);
+    ticket.setIdType(dto.getIdType());
+    ticket.setAddress(dto.getAddress());
+    ticket.setPhoneNumbers(dto.getPhoneNumbers());
+    ticket.setContactPersonName(dto.getContactPersonName());
+    ticket.setContactPersonLastName(dto.getContactPersonLastName());
+    ticket.setContactPersonPhone(dto.getContactPersonPhone());
     ticket.setCategory(dto.getCategory());
-    ticket.setSeatNumber(seat);
+    ticket.setSeatNumber(seatInfo);
     ticket.setFareValue(fare);
+    ticket.setBaggageId(baggageId);
+    ticket.setBaggageWeight(dto.getBaggageWeight());
+    ticket.setCargoWagonId(cargoWagonId);
+
+    // Buscar horarios en la ruta (si coincide origen/destino)
+    Route route = findRouteByStations(dto.getOrigin(), dto.getDestination());
+    if (route != null) {
+      // Aquí se deberían parsear las horas, pero por ahora las fijamos como String si
+      // el modelo lo permitiera
+      // Como el modelo usa LocalDateTime, pondremos valores actuales + offset
+      ticket.setDepartureTime(java.time.LocalDateTime.now().plusHours(1));
+      ticket.setArrivalTime(java.time.LocalDateTime.now().plusHours(3));
+    }
+
     ticketCache.put(ticket.getRegistrationId(), ticket);
     return ticket;
   }
 
+  private CargoWagon findAvailableCargoWagon(Train train) {
+    Iterator<Wagon> it = train.getWagons().iterator();
+    while (it.hasNext()) {
+      Wagon w = it.next();
+      if (w instanceof CargoWagon cw)
+        return cw;
+    }
+    return null;
+  }
+
+  private Route findRouteByStations(String originId, String destinationId) {
+    Iterator<Route> it = routes.iterator();
+    while (it.hasNext()) {
+      Route r = it.next();
+      // Verificación simplificada: si contiene ambas estaciones
+      boolean hasOrigin = false;
+      boolean hasDest = false;
+      Iterator<Station> sit = r.getStations().iterator();
+      while (sit.hasNext()) {
+        Station s = sit.next();
+        if (s.getId().equals(originId))
+          hasOrigin = true;
+        if (s.getId().equals(destinationId))
+          hasDest = true;
+      }
+      if (hasOrigin && hasDest)
+        return r;
+    }
+    return null;
+  }
+
   private double calculateFare(String originId, String destinationId) {
-    if (originId.equals(destinationId)) return -1.0;
+    if (originId.equals(destinationId))
+      return -1.0;
     Station origin = findStationById(originId);
     Station destination = findStationById(destinationId);
-    if (origin == null || destination == null) return -1.0;
+    if (origin == null || destination == null)
+      return -1.0;
     SinglyLinkedList<Station> path = graph.getShortestPath(origin, destination);
-    if (path.isEmpty()) return -1.0;
+    if (path.isEmpty())
+      return -1.0;
     double totalDistance = 0.0;
     Iterator<Station> it = path.iterator();
     Station prev = null;
     while (it.hasNext()) {
       Station curr = it.next();
-      if (prev != null) totalDistance += graph.getEdgeWeight(prev, curr);
+      if (prev != null)
+        totalDistance += graph.getEdgeWeight(prev, curr);
       prev = curr;
     }
     return totalDistance * 100.0;
   }
 
-  private String assignSeat(Train train, String category) {
+  private String assignSeatAndAddPassenger(Train train, String category, Passenger passenger) {
     SinglyLinkedList<Wagon> wagons = train.getWagons();
     Iterator<Wagon> it = wagons.iterator();
     while (it.hasNext()) {
       Wagon wagon = it.next();
-      if (wagon instanceof PassengerWagon passengerwagon) {
-        String seat = passengerwagon.assignSeat(category);
-        if (seat != null) return wagon.getId() + "-" + seat;
+      if (wagon instanceof PassengerWagon pw) {
+        if (pw.getAvailableSeatsByCategory(category) > 0) {
+          String seat = pw.assignSeat(category);
+          if (seat != null) {
+            pw.addPassenger(passenger, category);
+            return wagon.getId() + "-" + seat;
+          }
+        }
       }
     }
     return null;
@@ -151,7 +244,8 @@ public class SalesManager {
   public List<Train> getAllTrains() {
     SinglyLinkedList<Train> copy = new SinglyLinkedList<>();
     Iterator<Train> it = fleet.iterator();
-    while (it.hasNext()) copy.add(it.next());
+    while (it.hasNext())
+      copy.add(it.next());
     return copy;
   }
 
@@ -204,7 +298,8 @@ public class SalesManager {
     Iterator<Train> it = fleet.iterator();
     while (it.hasNext()) {
       Train train = it.next();
-      if (train.getId().equals(trainId)) return train;
+      if (train.getId().equals(trainId))
+        return train;
     }
     return null;
   }
@@ -212,13 +307,15 @@ public class SalesManager {
   public List<Route> getAllRoutes() {
     SinglyLinkedList<Route> copy = new SinglyLinkedList<>();
     Iterator<Route> it = routes.iterator();
-    while (it.hasNext()) copy.add(it.next());
+    while (it.hasNext())
+      copy.add(it.next());
     return copy;
   }
 
   public boolean addRoute(Route route) {
     routes.add(route);
     persistenceModule.saveRoutes(routes);
+    initializeStationsAndGraph(); // Reconstruir grafo
     return true;
   }
 
@@ -238,6 +335,7 @@ public class SalesManager {
     if (found) {
       routes = newList;
       persistenceModule.saveRoutes(routes);
+      initializeStationsAndGraph(); // Reconstruir grafo
     }
     return found;
   }
@@ -257,6 +355,60 @@ public class SalesManager {
     if (found) {
       routes = newList;
       persistenceModule.saveRoutes(routes);
+      initializeStationsAndGraph(); // Reconstruir grafo
+    }
+    return found;
+  }
+
+  public List<Employee> getAllEmployees() {
+    SinglyLinkedList<Employee> copy = new SinglyLinkedList<>();
+    Iterator<Employee> it = employees.iterator();
+    while (it.hasNext())
+      copy.add(it.next());
+    return copy;
+  }
+
+  public boolean addEmployee(Employee employee) {
+    employees.add(employee);
+    persistenceModule.saveEmployees(employees);
+    return true;
+  }
+
+  public boolean updateEmployee(Employee updatedEmployee) {
+    Iterator<Employee> it = employees.iterator();
+    SinglyLinkedList<Employee> newList = new SinglyLinkedList<>();
+    boolean found = false;
+    while (it.hasNext()) {
+      Employee emp = it.next();
+      if (emp.getId().equals(updatedEmployee.getId())) {
+        newList.add(updatedEmployee);
+        found = true;
+      } else {
+        newList.add(emp);
+      }
+    }
+    if (found) {
+      employees = newList;
+      persistenceModule.saveEmployees(employees);
+    }
+    return found;
+  }
+
+  public boolean deleteEmployee(String employeeId) {
+    Iterator<Employee> it = employees.iterator();
+    SinglyLinkedList<Employee> newList = new SinglyLinkedList<>();
+    boolean found = false;
+    while (it.hasNext()) {
+      Employee emp = it.next();
+      if (emp.getId().equals(employeeId)) {
+        found = true;
+      } else {
+        newList.add(emp);
+      }
+    }
+    if (found) {
+      employees = newList;
+      persistenceModule.saveEmployees(employees);
     }
     return found;
   }

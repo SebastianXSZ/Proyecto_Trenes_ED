@@ -27,8 +27,8 @@ public class SecurityModule {
     this.userList = persistenceModule.loadUsers();
     
     if (userList.isEmpty()) {
-      User admin = new User("1", "admin", hashPassword("1234"), "ADMIN");
-      User operador = new User("2", "operador", hashPassword("123"), "OPERATOR");
+      User admin = new User("1", "admin", hashPassword("1234"), "ADMIN", "Admin", "UPB");
+      User operador = new User("2", "operador", hashPassword("123"), "OPERATOR", "Operador", "UPB");
       userList.add(admin);
       userList.add(operador);
       persistenceModule.saveUsers(userList);
@@ -66,6 +66,19 @@ public class SecurityModule {
     return user != null ? user.getRole() : null;
   }
 
+  public User getUser(String username) {
+    return users.get(username);
+  }
+
+  public boolean updateUser(User updatedUser) {
+    User user = users.get(updatedUser.getUsername());
+    if (user == null) return false;
+    user.setName(updatedUser.getName());
+    user.setLastName(updatedUser.getLastName());
+    persistenceModule.saveUsers(userList);
+    return true;
+  }
+
   public String createSession(String username) {
     return java.util.UUID.randomUUID().toString();
   }
@@ -74,9 +87,9 @@ public class SecurityModule {
     users.put(user.getUsername(), user);
   }
 
-  public boolean registerUser(String id, String username, String password, String role) {
+  public boolean registerUser(String id, String username, String password, String role, String name, String lastName) {
     if (users.get(username) != null) return false;
-    User newUser = new User(id, username, hashPassword(password), role);
+    User newUser = new User(id, username, hashPassword(password), role, name, lastName);
     users.put(username, newUser);
     userList.add(newUser);
     persistenceModule.saveUsers(userList);

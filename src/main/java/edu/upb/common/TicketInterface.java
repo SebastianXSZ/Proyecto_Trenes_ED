@@ -15,7 +15,9 @@ public interface TicketInterface extends Remote {
   Ticket purchaseTicket(SaleDTO dto) throws RemoteException;
   boolean validateUser(LoginDTO login) throws RemoteException;
   String getUserRole(String username) throws RemoteException;
-  boolean registerUser(String id, String username, String password, String role) throws RemoteException;
+  edu.upb.model.User getUser(String username) throws RemoteException;
+  boolean updateUser(edu.upb.model.User user) throws RemoteException;
+  boolean registerUser(String id, String username, String password, String role, String name, String lastName) throws RemoteException;
   boolean changePassword(String username, String oldPassword, String newPassword) throws RemoteException;
   String[] getStationNames() throws RemoteException;
   List<Train> getAllTrains() throws RemoteException;
@@ -27,4 +29,8 @@ public interface TicketInterface extends Remote {
   boolean addRoute(Route route) throws RemoteException;
   boolean updateRoute(Route route) throws RemoteException;
   boolean deleteRoute(String routeId) throws RemoteException;
+  List<edu.upb.model.Employee> getAllEmployees() throws RemoteException;
+  boolean addEmployee(edu.upb.model.Employee employee) throws RemoteException;
+  boolean updateEmployee(edu.upb.model.Employee employee) throws RemoteException;
+  boolean deleteEmployee(String employeeId) throws RemoteException;
 }

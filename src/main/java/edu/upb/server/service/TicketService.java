@@ -69,8 +69,18 @@ public class TicketService extends UnicastRemoteObject implements TicketInterfac
   }
 
   @Override
-  public boolean registerUser(String id, String username, String password, String role) throws RemoteException {
-    return securityModule.registerUser(id, username, password, role);
+  public edu.upb.model.User getUser(String username) throws RemoteException {
+    return securityModule.getUser(username);
+  }
+
+  @Override
+  public boolean updateUser(edu.upb.model.User user) throws RemoteException {
+    return securityModule.updateUser(user);
+  }
+
+  @Override
+  public boolean registerUser(String id, String username, String password, String role, String name, String lastName) throws RemoteException {
+    return securityModule.registerUser(id, username, password, role, name, lastName);
   }
 
   @Override
@@ -131,5 +141,25 @@ public class TicketService extends UnicastRemoteObject implements TicketInterfac
   @Override
   public boolean deleteRoute(String routeId) throws RemoteException {
     return salesManager.deleteRoute(routeId);
+  }
+
+  @Override
+  public List<edu.upb.model.Employee> getAllEmployees() throws RemoteException {
+    return salesManager.getAllEmployees();
+  }
+
+  @Override
+  public boolean addEmployee(edu.upb.model.Employee employee) throws RemoteException {
+    return salesManager.addEmployee(employee);
+  }
+
+  @Override
+  public boolean updateEmployee(edu.upb.model.Employee employee) throws RemoteException {
+    return salesManager.updateEmployee(employee);
+  }
+
+  @Override
+  public boolean deleteEmployee(String employeeId) throws RemoteException {
+    return salesManager.deleteEmployee(employeeId);
   }
 }
