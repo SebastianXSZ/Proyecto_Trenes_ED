@@ -60,6 +60,7 @@ public class SalesManager {
         if (prev != null) {
           double segmentDistance = route.getDistance() > 0 ? route.getDistance() : 50.0;
           graph.addEdge(prev, curr, segmentDistance);
+          graph.addEdge(curr, prev, segmentDistance);
         }
         prev = curr;
       }
@@ -135,27 +136,16 @@ public class SalesManager {
   }
 
   public Ticket processTransaction(SaleDTO dto) {
-    if (fleet.isEmpty())
-      return null;
-    // Validar equipaje (RF-17: límite 80kg por maleta)
-    if (dto.getBaggageWeight() > 80) {
-      return null;
-    }
-
+    if (fleet.isEmpty()) return null;
+    if (dto.getBaggageWeight() > 80) return null;
+    double fare = calculateFare(dto.getOrigin(), dto.getDestination());
+    if (fare < 0) return null;
     Train selectedTrain = findTrainById(dto.getTrainId());
-    if (selectedTrain == null)
-      selectedTrain = fleet.iterator().next(); // Fallback
-
-    // Crear pasajero
+    if (selectedTrain == null) selectedTrain = fleet.iterator().next();
     String passengerId = dto.getPassengerId() != null ? dto.getPassengerId() : "P-" + System.currentTimeMillis();
     Passenger passenger = new Passenger(passengerId, dto.getPassengerName(), 0);
-
-    // Asignar asiento y agregar al vagón
     String seatInfo = assignSeatAndAddPassenger(selectedTrain, dto.getCategory(), passenger);
-    if (seatInfo == null)
-      return null;
-
-    // Manejar equipaje
+    if (seatInfo == null) return null;
     String cargoWagonId = "N/A";
     String baggageId = "N/A";
     if (dto.getBaggageWeight() > 0) {
@@ -167,17 +157,8 @@ public class SalesManager {
         baggageId = baggage.getId();
       }
     }
-
-    double fare = calculateFare(dto.getOrigin(), dto.getDestination());
-    if (fare < 0)
-      return null;
-
-    // Aplicar multiplicadores de categoría
-    if ("Premium".equalsIgnoreCase(dto.getCategory()))
-      fare *= 2.0;
-    else if ("Ejecutivo".equalsIgnoreCase(dto.getCategory()))
-      fare *= 1.5;
-
+    if ("Premium".equalsIgnoreCase(dto.getCategory())) fare *= 2.0;
+    else if ("Ejecutivo".equalsIgnoreCase(dto.getCategory())) fare *= 1.5;
     Ticket ticket = new Ticket();
     ticket.setTrainId(selectedTrain.getId());
     ticket.setPassengerName(dto.getPassengerName());
@@ -195,17 +176,11 @@ public class SalesManager {
     ticket.setBaggageId(baggageId);
     ticket.setBaggageWeight(dto.getBaggageWeight());
     ticket.setCargoWagonId(cargoWagonId);
-
-    // Buscar horarios en la ruta (si coincide origen/destino)
     Route route = findRouteByStations(dto.getOrigin(), dto.getDestination());
     if (route != null) {
-      // Aquí se deberían parsear las horas, pero por ahora las fijamos como String si
-      // el modelo lo permitiera
-      // Como el modelo usa LocalDateTime, pondremos valores actuales + offset
       ticket.setDepartureTime(java.time.LocalDateTime.now().plusHours(1));
       ticket.setArrivalTime(java.time.LocalDateTime.now().plusHours(3));
     }
-
     ticketCache.put(ticket.getRegistrationId(), ticket);
     return ticket;
   }
@@ -260,7 +235,7 @@ public class SalesManager {
         totalDistance += graph.getEdgeWeight(prev, curr);
       prev = curr;
     }
-    return totalDistance * 100.0;
+    return totalDistance * 1500.0;
   }
 
   private String assignSeatAndAddPassenger(Train train, String category, Passenger passenger) {
