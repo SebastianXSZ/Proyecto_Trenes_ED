@@ -121,12 +121,19 @@ public class TicketService extends UnicastRemoteObject implements TicketInterfac
   }
 
   @Override
-  public SinglyLinkedList<Passenger> getBoardingOrder(String trainId) throws RemoteException {
+  public Passenger[] getBoardingOrder(String trainId) throws RemoteException {
     Train train = salesManager.findTrainById(trainId);
-    if (train == null)
-      return new SinglyLinkedList<>();
+    if (train == null) return new Passenger[0];
     BoardingMonitor monitor = new BoardingMonitor();
-    return monitor.getBoardingOrder(train);
+    SinglyLinkedList<Passenger> order = monitor.getBoardingOrder(train);
+    int size = order.size();
+    Passenger[] result = new Passenger[size];
+    final int[] idx = {0};
+    order.forEach(p -> {
+      result[idx[0]++] = p;
+      return null;
+    });
+    return result;
   }
 
   @Override

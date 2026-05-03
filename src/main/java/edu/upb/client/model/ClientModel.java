@@ -186,7 +186,10 @@ public class ClientModel extends Subject {
 
   public SinglyLinkedList<Passenger> getBoardingOrder(String trainId) {
     try {
-      return ticketService.getBoardingOrder(trainId);
+      Passenger[] passengers = ticketService.getBoardingOrder(trainId);
+      SinglyLinkedList<Passenger> list = new SinglyLinkedList<>();
+      for (Passenger p : passengers) list.add(p);
+      return list;
     } catch (Exception e) {
       logger = "Error fetching boarding order: " + e.getMessage();
       notifyObservers("ERROR");
