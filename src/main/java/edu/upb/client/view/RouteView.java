@@ -23,6 +23,7 @@ public class RouteView extends javax.swing.JFrame implements Observer {
 
     private transient ClientModel model;
     private Route selectedRoute = null;
+    private transient List<Route> cachedRoutes = null;
 
     /**
      * Creates new form RouteView
@@ -37,6 +38,7 @@ public class RouteView extends javax.swing.JFrame implements Observer {
         initComponents();
         setLocationRelativeTo(null);
         loadRoutesToTable();
+        setupTableSelectionListener();
         addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowClosing(java.awt.event.WindowEvent e) {
@@ -66,6 +68,7 @@ public class RouteView extends javax.swing.JFrame implements Observer {
     private void loadRoutesToTable() {
         try {
             List<Route> routes = model.getAllRoutes();
+            this.cachedRoutes = routes;
             DefaultTableModel tableModel = (DefaultTableModel) tblRoutes.getModel();
             tableModel.setRowCount(0);
             Iterator<Route> it = routes.iterator();
@@ -83,6 +86,12 @@ public class RouteView extends javax.swing.JFrame implements Observer {
                         r.getDepartureTime(), r.getArrivalTime()
                 });
             }
+            tblRoutes.getColumnModel().getColumn(0).setPreferredWidth(60);
+            tblRoutes.getColumnModel().getColumn(1).setPreferredWidth(200);
+            tblRoutes.getColumnModel().getColumn(2).setPreferredWidth(200);
+            tblRoutes.getColumnModel().getColumn(3).setPreferredWidth(80);
+            tblRoutes.getColumnModel().getColumn(4).setPreferredWidth(80);
+            tblRoutes.getColumnModel().getColumn(5).setPreferredWidth(80);
         } catch (Exception e) {
             lblMessage.setText("Error al cargar rutas: " + e.getMessage());
         }
@@ -113,6 +122,59 @@ public class RouteView extends javax.swing.JFrame implements Observer {
             return false;
         }
         return true;
+    }
+
+    private void setupTableSelectionListener() {
+        tblRoutes.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                int selectedRow = tblRoutes.getSelectedRow();
+                if (selectedRow != -1) {
+                    String id = tblRoutes.getValueAt(selectedRow, 0).toString();
+                    // Buscar la ruta en cachedRoutes
+                    if (cachedRoutes != null) {
+                        Iterator<Route> it = cachedRoutes.iterator();
+                        while (it.hasNext()) {
+                            Route r = it.next();
+                            if (r.getId().equals(id)) {
+                                selectedRoute = r;
+                                break;
+                            }
+                        }
+                    }
+                    if (selectedRoute != null) {
+                        txtId.setText(selectedRoute.getId());
+                        String first = getFirstStationName(selectedRoute);
+                        String last = getLastStationName(selectedRoute);
+                        if (first != null)
+                            cmbOrigin.setSelectedItem(first);
+                        if (last != null)
+                            cmbDest.setSelectedItem(last);
+                        txtDistance.setText(String.valueOf(selectedRoute.getDistance()));
+                        txtDeparture.setText(selectedRoute.getDepartureTime());
+                        txtArrival.setText(selectedRoute.getArrivalTime());
+                    }
+                }
+            }
+        });
+    }
+
+    private String getFirstStationName(Route route) {
+        if (route == null)
+            return null;
+        Iterator<Station> it = route.getStations().iterator();
+        if (it.hasNext())
+            return it.next().getName();
+        return null;
+    }
+
+    private String getLastStationName(Route route) {
+        if (route == null)
+            return null;
+        Iterator<Station> it = route.getStations().iterator();
+        String last = null;
+        while (it.hasNext())
+            last = it.next().getName();
+        return last;
     }
 
     /**
