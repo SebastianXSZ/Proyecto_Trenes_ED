@@ -114,15 +114,8 @@ public class AdminView extends javax.swing.JFrame implements Observer {
     private void loadTrainsToTable() {
         try {
             cachedTrains = model.getAllTrains();
-            System.out.println(
-                    "DEBUG loadTrainsToTable: fetched " + (cachedTrains != null ? cachedTrains.size() : 0) + " trains");
-
             DefaultTableModel tableModel = (DefaultTableModel) tblTrains.getModel();
             tableModel.setRowCount(0);
-            System.out.println("DEBUG filterQuery='" + filterQuery + "' length="
-                    + (filterQuery != null ? filterQuery.length() : 0));
-
-            // Filtrar
             SinglyLinkedList<Train> filtered = new SinglyLinkedList<>();
             if (cachedTrains != null) {
                 Iterator<Train> it = cachedTrains.iterator();
@@ -133,27 +126,20 @@ public class AdminView extends javax.swing.JFrame implements Observer {
                     }
                 }
             }
-
-            System.out.println("DEBUG loadTrainsToTable: filtered size=" + filtered.size());
-
             // Paginación
             int total = filtered.size();
             int start = currentPage * pageSize;
             int end = Math.min(start + pageSize, total);
-            System.out.println("DEBUG loadTrainsToTable: total=" + total + ", start=" + start + ", end=" + end);
-
             Iterator<Train> it = filtered.iterator();
             int index = 0;
             while (it.hasNext() && index < end) {
                 Train t = it.next();
-                System.out.println("DEBUG: processing index=" + index + ", train id=" + t.getId());
                 if (index >= start) {
                     String type = (t instanceof edu.upb.model.MercedesBenzTrain) ? "Mercedes-Benz" : "Arnold";
                     tableModel.addRow(new Object[] {
                             t.getId(), t.getName(), type,
                             t.getLoadCapacity(), t.getMileage()
                     });
-                    System.out.println("DEBUG: Added row for train " + t.getId());
                 }
                 index++;
             }
@@ -194,9 +180,7 @@ public class AdminView extends javax.swing.JFrame implements Observer {
         String q = filterQuery.toLowerCase();
         String name = (t.getName() != null) ? t.getName().toLowerCase() : "";
         String id = (t.getId() != null) ? t.getId().toLowerCase() : "";
-        boolean result = name.contains(q) || id.contains(q);
-        System.out.println("DEBUG matchesFilter: q=" + q + " name=" + name + " id=" + id + " result=" + result);
-        return result;
+        return name.contains(q) || id.contains(q);
     }
 
     private void clearForm() {
@@ -520,7 +504,6 @@ public class AdminView extends javax.swing.JFrame implements Observer {
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnAddActionPerformed
         if (!validateForm())
             return;
-        System.out.println("DEBUG: Formulario validado. ID=" + txtId.getText().trim());
         String id = txtId.getText().trim();
         String name = txtName.getText().trim();
         double capacity = Double.parseDouble(txtCapacity.getText().trim());
@@ -544,17 +527,14 @@ public class AdminView extends javax.swing.JFrame implements Observer {
         train.addWagon(pw1);
         train.addWagon(pw2);
         train.addWagon(cw1);
-        System.out.println("DEBUG: Tren creado: " + train.getId() + ", vagones: " + train.getWagons().size());
         try {
             boolean result = model.addTrain(train);
-            System.out.println("DEBUG: model.addTrain devolvió: " + result);
             if (result) {
                 lblMessage.setText("Tren agregado.");
                 currentPage = 0;
                 loadTrainsToTable();
                 tblTrains.revalidate();
                 tblTrains.repaint();
-                System.out.println("DEBUG: Tabla refrescada después de agregar.");
                 clearForm();
             } else {
                 lblMessage.setText("Error al agregar el tren. Revisa la consola del servidor.");
