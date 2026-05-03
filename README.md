@@ -99,7 +99,7 @@ Se incluyen pruebas para:
 
 ## Evidencia del sistema
 
-[![Ver video del funcionamiento](https://img.youtube.com/vi/XXXXXXX/0.jpg)](https://youtu.be/XXXXXXX)
+[![Ver video del funcionamiento del sistema](https://img.youtube.com/vi/j831w2-QzaQ/0.jpg)](https://youtu.be/j831w2-QzaQ)
 
 ## Documentación adicional
 
