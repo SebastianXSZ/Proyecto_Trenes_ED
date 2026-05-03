@@ -102,7 +102,7 @@ public class SalesManager {
         "Kensington Way" // K
     };
 
-    // Matriz de distancias (solo celdas con valor)
+    // Matriz de distancias
     // Formato: origen, destino, distancia
     String[][] connections = {
         { "A", "B", "30" }, { "A", "C", "40" }, { "A", "D", "50" }, { "A", "E", "50" },
@@ -121,7 +121,7 @@ public class SalesManager {
       String fromName = stationNames[fromIdx];
       String toName = stationNames[toIdx];
       double dist = Double.parseDouble(conn[2]);
-      Route r = new Route(fromName + "-" + toName);
+      Route r = new Route(conn[0] + "-" + conn[1]);
       r.addStation(new Station(fromName, fromName));
       r.addStation(new Station(toName, toName));
       r.setDistance(dist);
@@ -268,13 +268,11 @@ public class SalesManager {
     Iterator<Wagon> it = wagons.iterator();
     while (it.hasNext()) {
       Wagon wagon = it.next();
-      if (wagon instanceof PassengerWagon pw) {
-        if (pw.getAvailableSeatsByCategory(category) > 0) {
-          String seat = pw.assignSeat(category);
-          if (seat != null) {
-            pw.addPassenger(passenger, category);
-            return wagon.getId() + "-" + seat;
-          }
+      if (wagon instanceof PassengerWagon pw && pw.getAvailableSeatsByCategory(category) > 0) {
+        String seat = pw.assignSeat(category);
+        if (seat != null) {
+          pw.addPassenger(passenger, category);
+          return wagon.getId() + "-" + seat;
         }
       }
     }
