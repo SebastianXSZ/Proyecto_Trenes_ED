@@ -68,7 +68,7 @@ public class ClientController {
   }
 
   private void showPurchaseView(String username) {
-    purchaseView = new PurchaseView();
+    purchaseView = new PurchaseView(model);
     purchaseView.setStationNames(model.getStationNames());
     purchaseView.setPurchaseHandler(this::handlePurchase);
     addProfileMenu(purchaseView, username);

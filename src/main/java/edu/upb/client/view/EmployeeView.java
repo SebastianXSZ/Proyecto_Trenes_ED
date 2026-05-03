@@ -75,6 +75,8 @@ public class EmployeeView extends javax.swing.JFrame implements Observer {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error al cargar empleados: " + e.getMessage());
         }
+        tblEmployees.revalidate();
+        tblEmployees.repaint();
     }
 
     @Override

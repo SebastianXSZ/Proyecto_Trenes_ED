@@ -18,13 +18,17 @@ import javax.swing.JOptionPane;
 public class PurchaseView extends javax.swing.JFrame {
 
         private transient Consumer<SaleDTO> purchaseHandler;
+        private transient edu.upb.client.model.ClientModel model;
 
         /**
          * Creates new form PurchaseView
          */
-        public PurchaseView() {
+        public PurchaseView(edu.upb.client.model.ClientModel model) {
+                this.model = model;
                 initComponents();
                 setLocationRelativeTo(null);
+                cmbOrigin.addActionListener(e -> updateRouteInfo());
+                cmbDest.addActionListener(e -> updateRouteInfo());
         }
 
         /**
@@ -121,6 +125,8 @@ public class PurchaseView extends javax.swing.JFrame {
                 txtContactPhone = new javax.swing.JTextField();
 
                 jLabel5.setText("Peso equipaje (kg):");
+                lblRouteInfo = new javax.swing.JLabel("Seleccione origen y destino para ver la ruta más corta.");
+
                 btnPurchase.setText("Comprar boleto");
                 btnPurchase.addActionListener(this::btnPurchaseActionPerformed);
 
@@ -139,6 +145,7 @@ public class PurchaseView extends javax.swing.JFrame {
                                                                 .addGroup(layout.createParallelGroup(
                                                                                 javax.swing.GroupLayout.Alignment.LEADING)
                                                                                 .addComponent(jScrollPane1)
+                                                                                .addComponent(lblRouteInfo)
                                                                                 .addGroup(layout.createSequentialGroup()
                                                                                                 .addGroup(layout
                                                                                                                 .createParallelGroup(
@@ -321,6 +328,8 @@ public class PurchaseView extends javax.swing.JFrame {
                                                                                                 javax.swing.GroupLayout.DEFAULT_SIZE,
                                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
                                                                                 .addComponent(btnPurchase))
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(lblRouteInfo)
                                                                 .addGap(18, 18, 18)
                                                                 .addComponent(jScrollPane1,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE,
@@ -354,6 +363,14 @@ public class PurchaseView extends javax.swing.JFrame {
                         return;
                 }
 
+                if (model != null) {
+                        double distance = model.getShortestDistance(origin, dest);
+                        if (distance <= 0) {
+                                JOptionPane.showMessageDialog(this, "No hay ruta disponible.");
+                                return;
+                        }
+                }
+
                 double baggage = 0;
                 try {
                         String bText = txtBaggage.getText().trim();
@@ -381,6 +398,25 @@ public class PurchaseView extends javax.swing.JFrame {
 
                 if (purchaseHandler != null)
                         purchaseHandler.accept(dto);
+        }
+
+        private void updateRouteInfo() {
+                String origin = (String) cmbOrigin.getSelectedItem();
+                String dest = (String) cmbDest.getSelectedItem();
+                if (origin == null || dest == null || origin.equals(dest)) {
+                        lblRouteInfo.setText("Origen y destino deben ser diferentes.");
+                        return;
+                }
+                if (model != null) {
+                        double distance = model.getShortestDistance(origin, dest);
+                        if (distance > 0) {
+                                double basePrice = distance * 100;
+                                lblRouteInfo.setText(
+                                                String.format("Distancia: %.2f km | Precio base: $%.2f", distance, basePrice));
+                        } else {
+                                lblRouteInfo.setText("No hay ruta disponible entre estas estaciones.");
+                        }
+                }
         }
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -412,6 +448,7 @@ public class PurchaseView extends javax.swing.JFrame {
         private javax.swing.JTextField txtContactName;
         private javax.swing.JTextField txtContactLastName;
         private javax.swing.JTextField txtContactPhone;
+        private javax.swing.JLabel lblRouteInfo;
         private javax.swing.JTextArea txtResult;
         // End of variables declaration//GEN-END:variables
 }

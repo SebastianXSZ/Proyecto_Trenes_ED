@@ -86,6 +86,8 @@ public class RouteView extends javax.swing.JFrame implements Observer {
         } catch (Exception e) {
             lblMessage.setText("Error al cargar rutas: " + e.getMessage());
         }
+        tblRoutes.revalidate();
+        tblRoutes.repaint();
     }
 
     private void clearForm() {

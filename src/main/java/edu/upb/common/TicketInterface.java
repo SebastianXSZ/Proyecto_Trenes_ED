@@ -1,10 +1,11 @@
 package edu.upb.common;
 
 import edu.upb.model.Train;
+import edu.upb.model.User;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import edu.sebsx.app.linkedlist.singly.SinglyLinkedList;
-import edu.sebsx.model.list.List;
+import edu.upb.model.Employee;
 import edu.upb.model.Passenger;
 import edu.upb.model.Route;
 import edu.upb.model.Ticket;
@@ -20,7 +21,7 @@ public interface TicketInterface extends Remote {
 
   String getUserRole(String username) throws RemoteException;
 
-  edu.upb.model.User getUser(String username) throws RemoteException;
+  User getUser(String username) throws RemoteException;
 
   boolean updateUser(edu.upb.model.User user) throws RemoteException;
 
@@ -31,7 +32,7 @@ public interface TicketInterface extends Remote {
 
   String[] getStationNames() throws RemoteException;
 
-  List<Train> getAllTrains() throws RemoteException;
+  Train[] getAllTrains() throws RemoteException;
 
   boolean addTrain(Train train) throws RemoteException;
 
@@ -41,7 +42,7 @@ public interface TicketInterface extends Remote {
 
   SinglyLinkedList<Passenger> getBoardingOrder(String trainId) throws RemoteException;
 
-  List<Route> getAllRoutes() throws RemoteException;
+  Route[] getAllRoutes() throws RemoteException;
 
   boolean addRoute(Route route) throws RemoteException;
 
@@ -49,11 +50,13 @@ public interface TicketInterface extends Remote {
 
   boolean deleteRoute(String routeId) throws RemoteException;
 
-  List<edu.upb.model.Employee> getAllEmployees() throws RemoteException;
+  Employee[] getAllEmployees() throws RemoteException;
 
-  boolean addEmployee(edu.upb.model.Employee employee) throws RemoteException;
+  boolean addEmployee(Employee employee) throws RemoteException;
 
-  boolean updateEmployee(edu.upb.model.Employee employee) throws RemoteException;
+  boolean updateEmployee(Employee employee) throws RemoteException;
 
   boolean deleteEmployee(String employeeId) throws RemoteException;
+
+  double getShortestDistance(String origin, String destination) throws RemoteException;
 }

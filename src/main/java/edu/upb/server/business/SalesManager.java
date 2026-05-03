@@ -77,6 +77,7 @@ public class SalesManager {
   }
 
   private void initializeTestData() {
+    // Tren de prueba
     Train train = new MercedesBenzTrain("T1", "Expreso UPB", 1000, 5000);
     PassengerWagon pw1 = new PassengerWagon("W1");
     PassengerWagon pw2 = new PassengerWagon("W2");
@@ -85,6 +86,52 @@ public class SalesManager {
     train.addWagon(pw2);
     train.addWagon(cw1);
     fleet.add(train);
+
+    // Mapeo de letras a nombres de estaciones
+    String[] stationNames = {
+        "Altea Park", // A
+        "Belmont Square", // B
+        "Cambridge Hills", // C
+        "Davenport Gate", // D
+        "East Hampton", // E
+        "Fairmont Boulevard", // F
+        "Grand Avenue", // G
+        "Highbury Station", // H
+        "Ivy District", // I
+        "Jade Gardens", // J
+        "Kensington Way" // K
+    };
+
+    // Matriz de distancias (solo celdas con valor)
+    // Formato: origen, destino, distancia
+    String[][] connections = {
+        { "A", "B", "30" }, { "A", "C", "40" }, { "A", "D", "50" }, { "A", "E", "50" },
+        { "B", "D", "40" }, { "B", "E", "80" }, { "B", "F", "120" }, { "B", "G", "110" },
+        { "C", "E", "80" }, { "C", "F", "120" }, { "C", "G", "110" },
+        { "D", "E", "20" }, { "D", "H", "65" },
+        { "E", "F", "50" }, { "E", "H", "80" },
+        { "F", "G", "30" }, { "F", "I", "145" },
+        { "G", "I", "145" },
+        { "H", "I", "30" }
+    };
+
+    for (String[] conn : connections) {
+      int fromIdx = conn[0].charAt(0) - 'A';
+      int toIdx = conn[1].charAt(0) - 'A';
+      String fromName = stationNames[fromIdx];
+      String toName = stationNames[toIdx];
+      double dist = Double.parseDouble(conn[2]);
+      Route r = new Route(fromName + "-" + toName);
+      r.addStation(new Station(fromName, fromName));
+      r.addStation(new Station(toName, toName));
+      r.setDistance(dist);
+      r.setDepartureTime("08:00");
+      r.setArrivalTime("09:00");
+      routes.add(r);
+    }
+
+    initializeStationsAndGraph();
+    persistenceModule.saveRoutes(this.routes);
   }
 
   public Ticket processTransaction(SaleDTO dto) {
@@ -123,7 +170,7 @@ public class SalesManager {
 
     double fare = calculateFare(dto.getOrigin(), dto.getDestination());
     if (fare < 0)
-      fare = 50000.0;
+      return null;
 
     // Aplicar multiplicadores de categoría
     if ("Premium".equalsIgnoreCase(dto.getCategory()))
@@ -239,12 +286,15 @@ public class SalesManager {
     Iterator<Train> it = fleet.iterator();
     while (it.hasNext())
       copy.add(it.next());
+    System.out.println("DEBUG SalesManager.getAllTrains: fleet size=" + fleet.size() + ", copy size=" + copy.size());
     return copy;
   }
 
   public boolean addTrain(Train train) {
+    System.out.println("DEBUG SalesManager.addTrain: recibiendo tren " + train.getId());
     fleet.add(train);
     persistenceModule.saveTrains(fleet);
+    System.out.println("DEBUG SalesManager.addTrain: flota guardada, tamaño actual: " + fleet.size());
     return true;
   }
 
@@ -328,7 +378,7 @@ public class SalesManager {
     if (found) {
       routes = newList;
       persistenceModule.saveRoutes(routes);
-      initializeStationsAndGraph(); // Reconstruir grafo
+      initializeStationsAndGraph();
     }
     return found;
   }
@@ -404,5 +454,60 @@ public class SalesManager {
       persistenceModule.saveEmployees(employees);
     }
     return found;
+  }
+
+  public double getShortestDistance(String originId, String destinationId) {
+    if (originId.equals(destinationId))
+      return -1;
+    Station origin = findStationById(originId);
+    Station destination = findStationById(destinationId);
+    if (origin == null || destination == null)
+      return -1;
+    SinglyLinkedList<Station> path = graph.getShortestPath(origin, destination);
+    if (path.isEmpty())
+      return -1;
+    double totalDistance = 0.0;
+    Iterator<Station> it = path.iterator();
+    Station prev = null;
+    while (it.hasNext()) {
+      Station curr = it.next();
+      if (prev != null)
+        totalDistance += graph.getEdgeWeight(prev, curr);
+      prev = curr;
+    }
+    return totalDistance;
+  }
+
+  public Train[] getAllTrainsArray() {
+    int size = fleet.size();
+    Train[] array = new Train[size];
+    final int[] idx = { 0 };
+    fleet.forEach(t -> {
+      array[idx[0]++] = t;
+      return null;
+    });
+    return array;
+  }
+
+  public Route[] getAllRoutesArray() {
+    int size = routes.size();
+    Route[] array = new Route[size];
+    final int[] idx = { 0 };
+    routes.forEach(r -> {
+      array[idx[0]++] = r;
+      return null;
+    });
+    return array;
+  }
+
+  public Employee[] getAllEmployeesArray() {
+    int size = employees.size();
+    Employee[] array = new Employee[size];
+    final int[] idx = { 0 };
+    employees.forEach(e -> {
+      array[idx[0]++] = e;
+      return null;
+    });
+    return array;
   }
 }

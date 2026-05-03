@@ -4,6 +4,7 @@ import java.rmi.Naming;
 import edu.upb.common.TicketInterface;
 import edu.upb.common.SaleDTO;
 import edu.upb.common.LoginDTO;
+import edu.upb.model.Employee;
 import edu.upb.model.Passenger;
 import edu.upb.model.Route;
 import edu.upb.model.Ticket;
@@ -79,7 +80,12 @@ public class ClientModel extends Subject {
   }
 
   public List<Train> getAllTrains() throws Exception {
-    return ticketService.getAllTrains();
+    Train[] trains = ticketService.getAllTrains();
+    SinglyLinkedList<Train> list = new SinglyLinkedList<>();
+    for (Train t : trains) {
+      list.add(t);
+    }
+    return list;
   }
 
   public boolean addTrain(Train train) {
@@ -189,7 +195,12 @@ public class ClientModel extends Subject {
   }
 
   public List<Route> getAllRoutes() throws Exception {
-    return ticketService.getAllRoutes();
+    Route[] routesArray = ticketService.getAllRoutes();
+    SinglyLinkedList<Route> list = new SinglyLinkedList<>();
+    for (Route r : routesArray) {
+      list.add(r);
+    }
+    return list;
   }
 
   public boolean addRoute(Route route) {
@@ -231,11 +242,16 @@ public class ClientModel extends Subject {
     }
   }
 
-  public List<edu.upb.model.Employee> getAllEmployees() throws Exception {
-    return ticketService.getAllEmployees();
+  public List<Employee> getAllEmployees() throws Exception {
+    Employee[] empArray = ticketService.getAllEmployees();
+    SinglyLinkedList<Employee> list = new SinglyLinkedList<>();
+    for (Employee e : empArray) {
+      list.add(e);
+    }
+    return list;
   }
 
-  public boolean addEmployee(edu.upb.model.Employee employee) {
+  public boolean addEmployee(Employee employee) {
     try {
       boolean success = ticketService.addEmployee(employee);
       if (success)
@@ -248,7 +264,7 @@ public class ClientModel extends Subject {
     }
   }
 
-  public boolean updateEmployee(edu.upb.model.Employee employee) {
+  public boolean updateEmployee(Employee employee) {
     try {
       boolean success = ticketService.updateEmployee(employee);
       if (success)
@@ -271,6 +287,16 @@ public class ClientModel extends Subject {
       logger = "Error deleting employee: " + e.getMessage();
       notifyObservers("ERROR");
       return false;
+    }
+  }
+
+  public double getShortestDistance(String origin, String destination) {
+    try {
+      return ticketService.getShortestDistance(origin, destination);
+    } catch (Exception e) {
+      logger = "Error fetching shortest distance: " + e.getMessage();
+      notifyObservers("ERROR");
+      return -1;
     }
   }
 }

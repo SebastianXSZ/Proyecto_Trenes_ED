@@ -6,6 +6,7 @@ import edu.upb.common.TicketInterface;
 import edu.upb.common.LoginDTO;
 import edu.upb.common.SaleDTO;
 import edu.upb.model.Train;
+import edu.upb.model.Employee;
 import edu.upb.model.Passenger;
 import edu.upb.model.Route;
 import edu.upb.model.Ticket;
@@ -14,7 +15,6 @@ import edu.upb.server.business.SalesManager;
 import edu.upb.server.business.SecurityModule;
 import edu.upb.server.persistence.PersistenceModule;
 import edu.sebsx.app.linkedlist.singly.SinglyLinkedList;
-import edu.sebsx.model.list.List;
 
 /**
  * Implementación del objeto remoto RMI que expone los servicios del sistema de
@@ -101,8 +101,8 @@ public class TicketService extends UnicastRemoteObject implements TicketInterfac
   }
 
   @Override
-  public List<Train> getAllTrains() throws RemoteException {
-    return salesManager.getAllTrains();
+  public Train[] getAllTrains() throws RemoteException {
+    return salesManager.getAllTrainsArray();
   }
 
   @Override
@@ -130,8 +130,8 @@ public class TicketService extends UnicastRemoteObject implements TicketInterfac
   }
 
   @Override
-  public List<Route> getAllRoutes() throws RemoteException {
-    return salesManager.getAllRoutes();
+  public Route[] getAllRoutes() throws RemoteException {
+    return salesManager.getAllRoutesArray();
   }
 
   @Override
@@ -150,22 +150,27 @@ public class TicketService extends UnicastRemoteObject implements TicketInterfac
   }
 
   @Override
-  public List<edu.upb.model.Employee> getAllEmployees() throws RemoteException {
-    return salesManager.getAllEmployees();
+  public Employee[] getAllEmployees() throws RemoteException {
+    return salesManager.getAllEmployeesArray();
   }
 
   @Override
-  public boolean addEmployee(edu.upb.model.Employee employee) throws RemoteException {
+  public boolean addEmployee(Employee employee) throws RemoteException {
     return salesManager.addEmployee(employee);
   }
 
   @Override
-  public boolean updateEmployee(edu.upb.model.Employee employee) throws RemoteException {
+  public boolean updateEmployee(Employee employee) throws RemoteException {
     return salesManager.updateEmployee(employee);
   }
 
   @Override
   public boolean deleteEmployee(String employeeId) throws RemoteException {
     return salesManager.deleteEmployee(employeeId);
+  }
+
+  @Override
+  public double getShortestDistance(String origin, String destination) throws RemoteException {
+    return salesManager.getShortestDistance(origin, destination);
   }
 }
