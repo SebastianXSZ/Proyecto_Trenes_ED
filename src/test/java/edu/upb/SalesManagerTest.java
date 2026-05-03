@@ -39,7 +39,7 @@ class SalesManagerTest {
         assertEquals("John Doe", ticket.getPassengerName());
         assertEquals("Premium", ticket.getCategory());
         assertNotNull(ticket.getSeatNumber());
-        assertEquals(6000.0, ticket.getFareValue(), 0.01); // 30*100*2
+        assertEquals(90000.0, ticket.getFareValue(), 0.01); // 30 km * 1500 * 2 (Premium)
     }
 
     @Test
