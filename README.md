@@ -84,7 +84,6 @@ Ambos lados (cliente y servidor) siguen el patrón **Modelo‑Vista‑Controlado
 |-----------|------------|--------------|
 | admin     | 1234       | ADMIN        |
 | operador  | 123        | OPERATOR     |
-| user      | 123        | STANDARD_USER (registrarse desde el login) |
 
 ## Pruebas unitarias
 
@@ -97,9 +96,9 @@ Se incluyen pruebas para:
 - SalesManager – procesamiento de transacciones con rutas.
 - SecurityModule – validación de credenciales.
 
-## Evidencia del sistema
+## Evidencia del funcionamiento del sistema
 
-[![Ver video del funcionamiento del sistema](https://img.youtube.com/vi/j831w2-QzaQ/0.jpg)](https://youtu.be/j831w2-QzaQ)
+[![Ver video del funcionamiento del sistema](https://img.youtube.com/vi/UxCUy7pEDd8/0.jpg)](https://youtu.be/UxCUy7pEDd8)
 
 ## Documentación adicional
 
